@@ -19,6 +19,12 @@ interface GitHubRepoIssueEntityDao {
     @Query("SELECT * FROM github_repo_issue")
     fun getAllRepoIssues(): LiveData<List<GitHubRepoIssueEntity>>
 
+    @Query("SELECT * FROM github_repo_issue WHERE state = 'open'")
+    fun getOpenIssuesInRepo(): LiveData<List<GitHubRepoIssueEntity>>
+
+    @Query("SELECT * FROM github_repo_issue WHERE state = 'closed'")
+    fun getClosedIssuesInRepo(): LiveData<List<GitHubRepoIssueEntity>>
+
     @Query("DELETE FROM github_repo_issue")
     fun deleteAll(): Int
 
