@@ -12,14 +12,24 @@ import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.GET
+import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface GitHubApiService {
 
-    @GET("/repos/tensorflow/ecosystem/issues")
+    /**
+     * @param repoFullName String to be set in the path
+     * @param pageSize Int count for number of items to include in response
+     * @param page Int used for page number
+     *
+     * @return Returns {@see kotlinx.coroutines.Deferred} value
+     * that has a result of type {@see retrofit2.Response}
+     */
+    @GET("/repos/{repoFullName}/issues")
     fun getRepoIssues(
-        @Query("PageSize") PageSize: Int,
-        @Query("Page") Page: Int
+        @Path("repoFullName") repoFullName: String,
+        @Query("PageSize") pageSize: Int,
+        @Query("Page") page: Int
     ): Deferred<Response<GetGitHubRepoIssuesResponse>>
 
 
