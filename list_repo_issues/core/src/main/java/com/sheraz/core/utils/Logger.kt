@@ -1,7 +1,7 @@
-package com.sheraz.listgithubrepoissues.utils
+package com.sheraz.core.utils
 
 import android.util.Log
-import com.sheraz.listgithubrepoissues.BuildConfig
+import com.sheraz.core.BuildConfig
 
 open class Logger {
 

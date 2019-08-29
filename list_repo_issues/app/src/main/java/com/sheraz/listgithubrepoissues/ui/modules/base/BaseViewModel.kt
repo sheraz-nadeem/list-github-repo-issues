@@ -3,7 +3,7 @@ package com.sheraz.listgithubrepoissues.ui.modules.base
 import androidx.databinding.ObservableBoolean
 import androidx.lifecycle.ViewModel
 import com.sheraz.listgithubrepoissues.data.CoroutinesDispatcherProvider
-import com.sheraz.listgithubrepoissues.utils.Logger
+import com.sheraz.core.utils.Logger
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancelChildren

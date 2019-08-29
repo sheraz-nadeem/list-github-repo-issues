@@ -1,17 +1,17 @@
-package com.sheraz.listgithubrepoissues.data.db.dao
+package com.sheraz.core.data.db.dao
 
 import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import com.sheraz.listgithubrepoissues.data.db.entity.GitHubRepoIssueEntity
+import com.sheraz.core.data.db.entity.GitHubRepoIssueEntity
 
 @Dao
 interface GitHubRepoIssueEntityDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insert(gitHubRepoEntity:  GitHubRepoIssueEntity)
+    fun insert(gitHubRepoEntity: GitHubRepoIssueEntity)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertList(gitHubRepoEntityList: List<GitHubRepoIssueEntity>)

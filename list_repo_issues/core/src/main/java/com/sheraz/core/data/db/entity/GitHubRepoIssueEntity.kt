@@ -1,4 +1,4 @@
-package com.sheraz.listgithubrepoissues.data.db.entity
+package com.sheraz.core.data.db.entity
 
 
 import androidx.room.ColumnInfo

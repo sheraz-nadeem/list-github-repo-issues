@@ -3,6 +3,8 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
 
+apply from: '../shared_dependencies.gradle'
+
 android {
 
     compileSdkVersion rootProject.ext.compileSdkVersion
@@ -41,15 +43,15 @@ android {
 }
 
 dependencies {
+
+    implementation project(':core')
+
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$rootProject.kotlinVersion"
 
     implementation "androidx.appcompat:appcompat:$rootProject.appCompatVersion"
     implementation "androidx.constraintlayout:constraintlayout:$rootProject.constraintLayoutVersion"
     implementation "com.google.android.material:material:$rootProject.googleAndroidMaterialVersion"
 
-    // AndroidX
-    implementation "androidx.core:core:$rootProject.androidXCoreVersion"
 
     // Useful Kotlin Extensions
     implementation "androidx.core:core-ktx:$rootProject.androidXCoreVersion"
@@ -59,22 +61,10 @@ dependencies {
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$rootProject.kotlinxCoroutinesVersion"
 
     // ViewModel & LiveData
-    implementation "androidx.lifecycle:lifecycle-extensions:$rootProject.lifecycleVersion"
     kapt "androidx.lifecycle:lifecycle-compiler:$rootProject.lifecycleVersion"
-
-    // Gson
-    implementation "com.google.code.gson:gson:$rootProject.gsonVersion"
-
-    // Room
-    implementation "androidx.room:room-runtime:$rootProject.roomVersion"
-    kapt "androidx.room:room-compiler:$rootProject.roomVersion"
-
 
 
     // Testing Dependencies
-    testImplementation "junit:junit:$rootProject.junitVersion"
     testImplementation "com.nhaarman.mockitokotlin2:mockito-kotlin:$rootProject.mockitoKotlinVersion"
     testImplementation "androidx.arch.core:core-testing:$rootProject.archCoreTestingVersion"
-    androidTestImplementation "androidx.test:runner:$rootProject.testRunnerVersion"
-    androidTestImplementation "androidx.test.espresso:espresso-core:$rootProject.espressoVersion"
 }

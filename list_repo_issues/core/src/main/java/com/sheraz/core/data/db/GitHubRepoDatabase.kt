@@ -1,11 +1,11 @@
-package com.sheraz.listgithubrepoissues.data.db
+package com.sheraz.core.data.db
 
 import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import com.sheraz.listgithubrepoissues.data.db.dao.GitHubRepoIssueEntityDao
-import com.sheraz.listgithubrepoissues.data.db.entity.GitHubRepoIssueEntity
+import com.sheraz.core.data.db.dao.GitHubRepoIssueEntityDao
+import com.sheraz.core.data.db.entity.GitHubRepoIssueEntity
 
 
 @Database(
@@ -21,7 +21,7 @@ abstract class GitHubRepoDatabase : RoomDatabase() {
      *  All Dao Methods
      **********/
 
-    abstract fun gitHubRepoEntityDao(): GitHubRepoIssueEntityDao
+    abstract fun gitHubRepoIssueEntityDao(): GitHubRepoIssueEntityDao
 
     companion object {
         @Volatile

@@ -1,4 +1,4 @@
-package com.sheraz.listgithubrepoissues.data.repository
+package com.sheraz.core.data.repository
 
 import androidx.lifecycle.LiveData
 

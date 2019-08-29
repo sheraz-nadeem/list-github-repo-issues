@@ -1,8 +1,8 @@
-package com.sheraz.listgithubrepoissues.data.repository
+package com.sheraz.core.data.repository
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.sheraz.listgithubrepoissues.utils.Logger
+import com.sheraz.core.utils.Logger
 import kotlin.Exception
 
 class AppRepositoryImpl: AppRepository {
