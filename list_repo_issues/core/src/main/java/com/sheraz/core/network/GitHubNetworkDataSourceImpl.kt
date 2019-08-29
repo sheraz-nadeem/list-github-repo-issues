@@ -1,5 +1,6 @@
 package com.sheraz.core.network
 
+import android.content.Context
 import com.sheraz.core.network.response.GetGitHubRepoIssuesResponse
 import com.sheraz.core.utils.Logger
 
@@ -58,6 +59,18 @@ class GitHubNetworkDataSourceImpl(
     }
 
     companion object {
+
         private val TAG: String = GitHubNetworkDataSourceImpl::class.java.simpleName
+
+        @Volatile
+        private var instance: GitHubNetworkDataSource? = null
+
+        operator fun invoke(context: Context): GitHubNetworkDataSource = instance ?: synchronized(this) {
+            return@synchronized instance ?: buildNetworkDataSource(context).also { instance = it }
+        }
+
+        private fun buildNetworkDataSource(context: Context) =
+            GitHubNetworkDataSourceImpl(Logger(), GitHubApiService(context))
+
     }
 }
