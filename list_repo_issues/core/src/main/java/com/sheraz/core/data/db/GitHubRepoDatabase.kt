@@ -26,11 +26,10 @@ abstract class GitHubRepoDatabase : RoomDatabase() {
     companion object {
         @Volatile
         private var instance: GitHubRepoDatabase? = null
-        private val LOCK = Any()
 
         // Below invoke function, implemented as an "operator function" which
         // allows us to get instance like => "GitHubRepoDatabase()"
-        operator fun invoke(context: Context) = instance ?: synchronized(LOCK) {
+        operator fun invoke(context: Context) = instance ?: synchronized(this) {
             instance ?: buildDatabase(context).also { instance = it }
         }
 

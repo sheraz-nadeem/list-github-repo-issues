@@ -37,10 +37,9 @@ interface GitHubApiService {
 
         @Volatile
         private var instance: GitHubApiService? = null
-        private val LOCK = Any()
         private const val BASE_URL = "https://api.github.com"
 
-        operator fun invoke(context: Context): GitHubApiService = instance ?: synchronized(LOCK) {
+        operator fun invoke(context: Context): GitHubApiService = instance ?: synchronized(this) {
             return instance ?: buildApi(context).also { instance = it }
         }
 
