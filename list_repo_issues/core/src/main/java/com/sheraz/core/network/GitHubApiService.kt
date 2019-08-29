@@ -28,6 +28,7 @@ interface GitHubApiService {
         @Volatile
         private var instance: GitHubApiService? = null
         private val LOCK = Any()
+        private const val BASE_URL = "https://api.github.com"
 
         operator fun invoke(context: Context): GitHubApiService = instance ?: synchronized(LOCK) {
             return instance ?: buildApi(context).also { instance = it }
@@ -35,6 +36,7 @@ interface GitHubApiService {
 
         private fun buildApi(context: Context) =
             Retrofit.Builder()
+                .baseUrl(BASE_URL)
                 .client(getOkHttpClient(context))
                 .addCallAdapterFactory(CoroutineCallAdapterFactory())
                 .addConverterFactory(GsonConverterFactory.create(Gson()))
