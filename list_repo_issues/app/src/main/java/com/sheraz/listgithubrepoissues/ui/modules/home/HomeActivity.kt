@@ -5,10 +5,10 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.google.android.material.snackbar.Snackbar
 import com.sheraz.core.data.repository.AppRepository
-import com.sheraz.core.data.repository.AppRepositoryImpl
 import com.sheraz.listgithubrepoissues.BR
 import com.sheraz.listgithubrepoissues.R
 import com.sheraz.listgithubrepoissues.databinding.ActivityHomeBinding
+import com.sheraz.listgithubrepoissues.di.Injector
 import com.sheraz.listgithubrepoissues.ui.modules.base.BaseActivityToolbar
 import kotlinx.android.synthetic.main.activity_home.*
 
@@ -16,9 +16,9 @@ import kotlinx.android.synthetic.main.activity_home.*
 class HomeActivity : BaseActivityToolbar<ActivityHomeBinding, HomeViewModel>() {
 
     private var activityHomeBinding: ActivityHomeBinding? = null
-    private lateinit var homeViewModelFactory: HomeViewModelFactory
+    private val homeViewModelFactory: HomeViewModelFactory
     private lateinit var homeViewModel: HomeViewModel
-    private lateinit var appRepository: AppRepository
+    private val appRepository: AppRepository
 
     private val ownerName = "tensorflow"
     private val repoName = "ecosystem"
@@ -26,6 +26,8 @@ class HomeActivity : BaseActivityToolbar<ActivityHomeBinding, HomeViewModel>() {
     init {
 
         logger.d(TAG, "init(): ")
+        appRepository = Injector.getCoreComponent().appRepository()
+        homeViewModelFactory = Injector.getAppComponent().homeViewModelFactory()
 
     }
 
@@ -33,8 +35,6 @@ class HomeActivity : BaseActivityToolbar<ActivityHomeBinding, HomeViewModel>() {
         logger.d(TAG, "onCreate(): ")
         super.onCreate(savedInstanceState)
 
-        appRepository = AppRepositoryImpl(this)
-        homeViewModelFactory = HomeViewModelFactory(appRepository)
         homeViewModel = ViewModelProviders.of(this, homeViewModelFactory).get(HomeViewModel::class.java)
 
         performDataBinding()
