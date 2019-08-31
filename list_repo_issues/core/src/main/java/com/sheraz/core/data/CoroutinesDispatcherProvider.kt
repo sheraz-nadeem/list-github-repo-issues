@@ -1,4 +1,4 @@
-package com.sheraz.listgithubrepoissues.data
+package com.sheraz.core.data
 
 import kotlinx.coroutines.CoroutineDispatcher
 
