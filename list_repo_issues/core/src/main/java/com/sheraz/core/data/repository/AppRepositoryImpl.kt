@@ -1,13 +1,10 @@
 package com.sheraz.core.data.repository
 
-import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.sheraz.core.data.db.GitHubRepoDatabase
 import com.sheraz.core.data.db.dao.GitHubRepoIssueEntityDao
 import com.sheraz.core.data.db.entity.GitHubRepoIssueEntity
 import com.sheraz.core.network.GitHubNetworkDataSource
-import com.sheraz.core.network.GitHubNetworkDataSourceImpl
 import com.sheraz.core.network.response.GetGitHubRepoIssuesResponse
 import com.sheraz.core.utils.Logger
 import kotlin.Exception
@@ -163,12 +160,16 @@ class AppRepositoryImpl(
         @Volatile
         private var instance: AppRepository? = null
 
-        operator fun invoke(context: Context): AppRepository = instance ?: synchronized(this) {
-            return@synchronized instance ?: buildAppRepository(context).also { instance = it }
+        operator fun invoke(logger: Logger,
+                            dao: GitHubRepoIssueEntityDao,
+                            networkDataSource: GitHubNetworkDataSource): AppRepository = instance ?: synchronized(this) {
+            return@synchronized instance ?: buildAppRepository(logger, dao, networkDataSource).also { instance = it }
         }
 
-        private fun buildAppRepository(context: Context) =
-            AppRepositoryImpl(Logger(), GitHubRepoDatabase(context).gitHubRepoIssueEntityDao(), GitHubNetworkDataSourceImpl(context))
+        private fun buildAppRepository(logger: Logger,
+                                       dao: GitHubRepoIssueEntityDao,
+                                       networkDataSource: GitHubNetworkDataSource) =
+            AppRepositoryImpl(logger, dao, networkDataSource)
 
     }
 }

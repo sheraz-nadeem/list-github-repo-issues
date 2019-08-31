@@ -12,6 +12,11 @@ dependencies {
     // ViewModel & LiveData
     implementation "androidx.lifecycle:lifecycle-extensions:$rootProject.lifecycleVersion"
 
+    // Dagger
+    implementation "com.google.dagger:dagger:$rootProject.daggerVersion"
+    kapt "com.google.dagger:dagger-compiler:$rootProject.daggerVersion"
+    kaptAndroidTest "com.google.dagger:dagger-compiler:$rootProject.daggerVersion"
+
     // Testing Dependencies
     testImplementation "junit:junit:$rootProject.junitVersion"
     androidTestImplementation "androidx.test:runner:$rootProject.testRunnerVersion"

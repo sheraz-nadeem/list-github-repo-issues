@@ -1,12 +1,14 @@
 package com.sheraz.core.network
 
-import android.util.Log
+import com.sheraz.core.utils.Logger
 import okhttp3.logging.HttpLoggingInterceptor
 
-class HttpLogger: HttpLoggingInterceptor.Logger {
+class HttpLogger(
+    private val logger: Logger
+): HttpLoggingInterceptor.Logger {
 
     override fun log(message: String) {
-        Log.d(TAG, "RAW_MESSAGE $message")
+        logger.d(TAG, "RAW_MESSAGE $message")
     }
 
 
