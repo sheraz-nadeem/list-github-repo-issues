@@ -16,12 +16,12 @@ import javax.inject.Singleton
 @Singleton
 @Component(
     modules = [
-    ContextModule::class,
-    DaoModule::class,
-    DatabaseModule::class,
-    LoggerModule::class,
-    NetworkModule::class,
-    RepositoryModule::class
+        ContextModule::class,
+        DaoModule::class,
+        DatabaseModule::class,
+        LoggerModule::class,
+        NetworkModule::class,
+        RepositoryModule::class
     ]
 )
 interface CoreComponent {
