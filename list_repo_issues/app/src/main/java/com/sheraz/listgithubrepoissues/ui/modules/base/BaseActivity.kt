@@ -11,7 +11,7 @@ import com.sheraz.core.utils.Logger
 abstract class BaseActivity<VIEW_DATA_BINDING : ViewDataBinding, VIEW_MODEL : BaseViewModel> : AppCompatActivity() {
 
     private lateinit var progressDialog: Dialog
-    private lateinit var baseViewDataBinding: VIEW_DATA_BINDING
+    private var baseViewDataBinding: VIEW_DATA_BINDING? = null
     private lateinit var baseViewModel: VIEW_MODEL
 
     protected val logger = Logger()
@@ -28,7 +28,7 @@ abstract class BaseActivity<VIEW_DATA_BINDING : ViewDataBinding, VIEW_MODEL : Ba
         super.onCreate(savedInstanceState)
     }
 
-    protected fun getViewDataBinding(): VIEW_DATA_BINDING {
+    protected fun getViewDataBinding(): VIEW_DATA_BINDING? {
         logger.d(TAG, "getViewDataBinding(): ")
         return baseViewDataBinding
     }
@@ -40,10 +40,10 @@ abstract class BaseActivity<VIEW_DATA_BINDING : ViewDataBinding, VIEW_MODEL : Ba
 
     protected fun performDataBinding() {
         logger.d(TAG, "performDataBinding(): ")
-        baseViewDataBinding = DataBindingUtil.setContentView(this, getLayoutResId())
+        baseViewDataBinding = baseViewDataBinding ?: DataBindingUtil.setContentView(this, getLayoutResId())
         baseViewModel = getViewModel()
-        baseViewDataBinding.setVariable(getBindingVariable(), baseViewModel)
-        baseViewDataBinding.executePendingBindings()
+        baseViewDataBinding?.setVariable(getBindingVariable(), baseViewModel)
+        baseViewDataBinding?.executePendingBindings()
     }
 
 
