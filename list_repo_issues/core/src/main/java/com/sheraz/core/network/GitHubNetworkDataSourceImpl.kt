@@ -1,6 +1,7 @@
 package com.sheraz.core.network
 
 import android.content.Context
+import com.sheraz.core.data.db.entity.GitHubRepoIssueEntity
 import com.sheraz.core.network.response.GetGitHubRepoIssuesResponse
 import com.sheraz.core.utils.Logger
 
@@ -21,10 +22,10 @@ class GitHubNetworkDataSourceImpl(
      *
      * @return [GetGitHubRepoIssuesResponse] response object
      */
-    override suspend fun loadRepoIssuesFromNetwork(repoFullName: String, pageSize: Int, page: Int): GetGitHubRepoIssuesResponse {
+    override suspend fun loadRepoIssuesFromNetwork(ownerName: String, repoName: String, pageSize: Int, page: Int): List<GitHubRepoIssueEntity> {
 
-        logger.d(TAG, "loadRepoIssuesFromNetwork(): repoFullName: $repoFullName, pageSize: $pageSize, page: $page")
-        return fetchRepoIssuesFromNetwork(repoFullName, pageSize, page)
+        logger.d(TAG, "loadRepoIssuesFromNetwork(): ownerName: $ownerName, repoName: $repoName, pageSize: $pageSize, page: $page")
+        return fetchRepoIssuesFromNetwork(ownerName, repoName, pageSize, page)
 
     }
 
@@ -39,23 +40,22 @@ class GitHubNetworkDataSourceImpl(
      *
      * @return [GetGitHubRepoIssuesResponse] response object
      */
-    private suspend fun fetchRepoIssuesFromNetwork(repoFullName: String, pageSize: Int, page: Int): GetGitHubRepoIssuesResponse {
+    private suspend fun fetchRepoIssuesFromNetwork(ownerName: String, repoName: String, pageSize: Int, page: Int): List<GitHubRepoIssueEntity> {
 
-        logger.d(TAG, "fetchRepoIssuesFromNetwork(): repoFullName: $repoFullName, pageSize: $pageSize, page: $page")
+        logger.d(TAG, "fetchRepoIssuesFromNetwork(): ownerName: $ownerName, repoName: $repoName, pageSize: $pageSize, page: $page")
 
-        val response = gitHubApiService.getRepoIssues(repoFullName, pageSize, page).await()
+        val response = gitHubApiService.getRepoIssues(ownerName, repoName, pageSize, page).await()
 
         if (response.isSuccessful) {
 
             val responseBody = response.body()
             if (responseBody != null) {
-                logger.i(TAG, "fetchRepoIssuesFromNetwork(): response: $responseBody")
                 return responseBody
             }
 
         }
 
-        return GetGitHubRepoIssuesResponse(emptyList())
+        return emptyList()
     }
 
     companion object {

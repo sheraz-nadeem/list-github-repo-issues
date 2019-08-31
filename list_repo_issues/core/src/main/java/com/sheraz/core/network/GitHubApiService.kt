@@ -3,7 +3,7 @@ package com.sheraz.core.network
 import android.content.Context
 import com.google.gson.Gson
 import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory
-import com.sheraz.core.network.response.GetGitHubRepoIssuesResponse
+import com.sheraz.core.data.db.entity.GitHubRepoIssueEntity
 import kotlinx.coroutines.Deferred
 import okhttp3.Cache
 import okhttp3.OkHttpClient
@@ -18,19 +18,21 @@ import retrofit2.http.Query
 interface GitHubApiService {
 
     /**
-     * @param repoFullName String to be set in the path
+     * @param ownerName String repository owner name
+     * @param repoName String repository name
      * @param pageSize Int count for number of items to include in response
      * @param page Int used for page number
      *
      * @return Returns {@see kotlinx.coroutines.Deferred} value
      * that has a result of type {@see retrofit2.Response}
      */
-    @GET("/repos/{repoFullName}/issues")
+    @GET("/repos/{ownerName}/{repoName}/issues")
     fun getRepoIssues(
-        @Path("repoFullName") repoFullName: String,
-        @Query("PageSize") pageSize: Int,
-        @Query("Page") page: Int
-    ): Deferred<Response<GetGitHubRepoIssuesResponse>>
+        @Path("ownerName") ownerName: String,
+        @Path("repoName") repoName: String,
+        @Query("per_page") pageSize: Int,
+        @Query("page") page: Int
+    ): Deferred<Response<List<GitHubRepoIssueEntity>>>
 
 
     companion object {
@@ -54,9 +56,10 @@ interface GitHubApiService {
         private fun getOkHttpClient(context: Context) =
             OkHttpClient.Builder()
                 .cache(Cache(context.cacheDir, 10*1024*1024))
-                .addInterceptor(HttpLoggingInterceptor(HttpLogger()))
+                .addInterceptor(getLoggingInterceptor())
                 .build()
 
+        private fun getLoggingInterceptor() = HttpLoggingInterceptor(HttpLogger()).also { it.level = HttpLoggingInterceptor.Level.BODY }
 
     }
 

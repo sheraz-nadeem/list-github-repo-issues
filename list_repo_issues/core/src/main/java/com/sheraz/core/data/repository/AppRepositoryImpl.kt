@@ -77,9 +77,9 @@ class AppRepositoryImpl(
     /**
      * Method that sends request using [GitHubNetworkDataSource] and also persist data in local cache
      */
-    override suspend fun fetchGitHubRepoIssuesList(repoFullName: String, page: Int, per_page: Int) {
-        logger.d(TAG, "fetchGitHubRepoIssuesList(): ")
-        requestRepoIssuesAndPersist(repoFullName, page, per_page)
+    override suspend fun loadGitHubRepoIssuesList(ownerName: String, repoName: String, pageSize: Int, page: Int) {
+        logger.d(TAG, "loadGitHubRepoIssuesList(): ")
+        fetchGitHubRepoIssuesAndPersist(ownerName, repoName, pageSize, page)
     }
 
     /**
@@ -87,20 +87,21 @@ class AppRepositoryImpl(
      */
     override suspend fun refreshGitHubRepoIssuesList() {
         logger.d(TAG, "refreshCallRecordingsList(): ")
-        requestRepoIssuesAndPersist("", -1)
+        fetchGitHubRepoIssuesAndPersist("", "", AppRepository.NETWORK_PAGE_SIZE, -1)
     }
 
     /**
      * Method that initiates network request and also persists data in local cache
      */
-    private suspend fun requestRepoIssuesAndPersist(repoFullName: String = "", page: Int = 1, per_page: Int = AppRepository.NETWORK_PAGE_SIZE) {
+    private suspend fun fetchGitHubRepoIssuesAndPersist(ownerName: String = "", repoName: String = "", pageSize: Int = AppRepository.NETWORK_PAGE_SIZE, page: Int = 1) {
 
-        logger.d(TAG,"requestRepoIssuesAndPersist(): ")
+        logger.d(TAG,"fetchGitHubRepoIssuesAndPersist(): ")
 
-        val response = fetchRepoIssuesFromNetworkAndPersist(repoFullName, page, per_page)
-        if (response != null && response.gitHubRepoIssueList != null) {
-            logger.d(TAG,"requestRepoIssuesAndPersist(): response is success")
-            persistDownloadedGitHubRepoIssuesList(response.gitHubRepoIssueList)
+        val response = fetchRepoIssuesFromNetworkAndPersist(ownerName, repoName, pageSize, page)
+        if (response != null) {
+            logger.d(TAG,"fetchGitHubRepoIssuesAndPersist(): response is success")
+            _isFetchInProgress.postValue(false)
+            persistDownloadedGitHubRepoIssuesList(response)
         }
 
     }
@@ -109,16 +110,16 @@ class AppRepositoryImpl(
      * Method that sends request using [GitHubNetworkDataSource] and returns
      * [GetGitHubRepoIssuesResponse] response wrapped inside [Result]
      */
-    private suspend fun fetchRepoIssuesFromNetworkAndPersist(repoFullName: String, page: Int = 1, per_page: Int = AppRepository.NETWORK_PAGE_SIZE): GetGitHubRepoIssuesResponse {
+    private suspend fun fetchRepoIssuesFromNetworkAndPersist(ownerName: String = "", repoName: String = "", pageSize: Int = AppRepository.NETWORK_PAGE_SIZE, page: Int = 1): List<GitHubRepoIssueEntity> {
 
-        logger.d(TAG, "fetchRepoIssuesFromNetworkAndPersist(): repoFullName: $repoFullName, page: $page, per_page: $per_page")
+        logger.d(TAG, "fetchRepoIssuesFromNetworkAndPersist(): ownerName: $ownerName, repoName: $repoName, pageSize: $pageSize, page: $page")
 
         _isFetchInProgress.postValue(true)
         val numOfRows = getNumOfRows()
         val actualPageSize = getActualPageSize(page, numOfRows)
         logger.i(TAG,"fetchRepoIssuesFromNetworkAndPersist(): numOfRows: $numOfRows, actualPageSize: $actualPageSize")
 
-        return gitHubNetworkDataSource.loadRepoIssuesFromNetwork(repoFullName, actualPageSize, per_page)
+        return gitHubNetworkDataSource.loadRepoIssuesFromNetwork(ownerName, repoName, pageSize, actualPageSize)
 
     }
 
@@ -149,8 +150,8 @@ class AppRepositoryImpl(
 
     private fun getActualPageSize(page: Int, numOfRows: Int): Int {
         return when (page > 0) {
-            true -> (numOfRows / AppRepository.NETWORK_PAGE_SIZE)
-            false -> 0 // We need to refresh data
+            true -> (numOfRows / AppRepository.NETWORK_PAGE_SIZE) + 1
+            false -> 1 // We need to refresh data
         }
     }
 

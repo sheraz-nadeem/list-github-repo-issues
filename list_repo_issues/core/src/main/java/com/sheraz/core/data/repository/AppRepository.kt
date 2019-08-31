@@ -12,7 +12,7 @@ interface AppRepository {
     fun getOpenIssuesLiveData(): LiveData<List<GitHubRepoIssueEntity>>
     fun getClosedIssuesLiveData(): LiveData<List<GitHubRepoIssueEntity>>
     suspend fun clearCache()
-    suspend fun fetchGitHubRepoIssuesList(repoFullName: String, page: Int, per_page: Int)
+    suspend fun loadGitHubRepoIssuesList(ownerName: String = "", repoName: String = "", pageSize: Int = NETWORK_PAGE_SIZE, page: Int = 1)
     suspend fun refreshGitHubRepoIssuesList()
 
     companion object {
