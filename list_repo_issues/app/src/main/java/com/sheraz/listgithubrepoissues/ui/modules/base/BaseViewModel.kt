@@ -2,8 +2,9 @@ package com.sheraz.listgithubrepoissues.ui.modules.base
 
 import androidx.databinding.ObservableBoolean
 import androidx.lifecycle.ViewModel
-import com.sheraz.listgithubrepoissues.data.CoroutinesDispatcherProvider
+import com.sheraz.core.data.CoroutinesDispatcherProvider
 import com.sheraz.core.utils.Logger
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancelChildren
@@ -11,10 +12,11 @@ import kotlinx.coroutines.cancelChildren
 abstract class BaseViewModel: ViewModel() {
 
 
-    val isLoading = ObservableBoolean(false)
+    private val isLoading = ObservableBoolean(false)
     protected val logger = Logger()
     protected val parentJob = Job()
     protected val dispatcherProvider = CoroutinesDispatcherProvider(Dispatchers.Main, Dispatchers.IO, Dispatchers.Default)
+    protected val scope = CoroutineScope(dispatcherProvider.mainDispatcher + parentJob)
 
     init {
         logger.d(TAG, "init(): ")
