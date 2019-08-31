@@ -9,6 +9,10 @@ import com.sheraz.listgithubrepoissues.R
 import kotlinx.android.synthetic.main.app_toolbar.*
 
 
+/**
+ * An abstract base class with toolbar
+ */
+
 abstract class BaseActivityToolbar<T : ViewDataBinding, VM : BaseViewModel>: BaseActivity<T, VM>() {
 
     init {

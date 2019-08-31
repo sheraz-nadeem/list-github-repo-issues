@@ -9,6 +9,13 @@ import com.sheraz.core.network.response.GetGitHubRepoIssuesResponse
 import com.sheraz.core.utils.Logger
 import kotlin.Exception
 
+/**
+ * This class is responsible for interacting with data sources
+ * [GitHubRepoIssueEntityDao] & [GitHubNetworkDataSource]
+ * This class is also responsible for generating events so that
+ * a UI component/subscriber can update its state.
+ */
+
 class AppRepositoryImpl(
     private val logger: Logger,
     private val gitHubRepoIssueEntityDao: GitHubRepoIssueEntityDao,

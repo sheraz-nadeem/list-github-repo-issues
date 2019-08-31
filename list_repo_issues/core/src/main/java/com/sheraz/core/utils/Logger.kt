@@ -3,6 +3,11 @@ package com.sheraz.core.utils
 import android.util.Log
 import com.sheraz.core.BuildConfig
 
+/**
+ * A public class that will be used to log
+ * messages in the Android Logcat
+ */
+
 open class Logger {
 
     private val TAG = Logger::class.java.simpleName

@@ -18,6 +18,12 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import javax.inject.Singleton
 
+/**
+ * Module responsible for providing all the instances required for
+ * networking tasks like [OkHttpClient], [Retrofit], [GitHubApiService]
+ * & [GitHubNetworkDataSource] instances.
+ */
+
 @Module
 class NetworkModule {
 

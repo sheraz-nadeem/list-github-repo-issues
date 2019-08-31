@@ -3,6 +3,11 @@ package com.sheraz.listgithubrepoissues.ui.models
 import android.os.Parcelable
 import kotlinx.android.parcel.Parcelize
 
+/**
+ * A UI model class that will be used to render
+ * data in our views.
+ */
+
 @Parcelize
 data class GitHubRepoIssueItem(
     val id: Int,

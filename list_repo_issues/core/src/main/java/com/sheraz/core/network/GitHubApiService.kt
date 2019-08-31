@@ -8,6 +8,11 @@ import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query
 
+/**
+ * An interface that is used by [Retrofit] to provide
+ * methods for network calls
+ */
+
 interface GitHubApiService {
 
     /**

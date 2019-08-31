@@ -6,6 +6,10 @@ import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton
 
+/**
+ * Module responsible for providing [GitHubRepoDatabase] instance
+ */
+
 @Module
 class DatabaseModule {
 

@@ -9,6 +9,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancelChildren
 
+/**
+ * An abstract base class for our ViewModels
+ */
+
 abstract class BaseViewModel: ViewModel() {
 
 
@@ -31,6 +35,11 @@ abstract class BaseViewModel: ViewModel() {
         isLoading.set(loading)
     }
 
+    /**
+     * This method is special as it cancels all the coroutines
+     * running under as child to our `parentJob` as soon as
+     * the view model is detached from its lifecycle owner.
+     */
     override fun onCleared() {
         logger.d(TAG, "onCleared(): ")
         super.onCleared()

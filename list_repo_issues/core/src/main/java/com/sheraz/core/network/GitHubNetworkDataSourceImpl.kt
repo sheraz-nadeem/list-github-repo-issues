@@ -4,6 +4,12 @@ import com.sheraz.core.data.db.entity.GitHubRepoIssueEntity
 import com.sheraz.core.utils.Logger
 
 
+/**
+ * This class is responsible for providing interfacing
+ * with [GitHubApiService], to fetch & return network
+ * responses.
+ */
+
 class GitHubNetworkDataSourceImpl(
     private val logger: Logger,
     private val gitHubApiService: GitHubApiService

@@ -12,6 +12,9 @@ import com.sheraz.listgithubrepoissues.di.Injector
 import com.sheraz.listgithubrepoissues.ui.modules.base.BaseActivityToolbar
 import kotlinx.android.synthetic.main.activity_home.*
 
+/**
+ * HomeActivity class for our Home view.
+ */
 
 class HomeActivity : BaseActivityToolbar<ActivityHomeBinding, HomeViewModel>() {
 

@@ -9,6 +9,11 @@ import com.sheraz.listgithubrepoissues.ui.modules.home.HomeViewModel
 import com.sheraz.listgithubrepoissues.ui.modules.home.HomeViewModelFactory
 import dagger.Component
 
+/**
+ * A Dagger Component that is responsible for
+ * providing UI-related dependencies
+ */
+
 @Component(
     modules = [
         HomeModule::class,

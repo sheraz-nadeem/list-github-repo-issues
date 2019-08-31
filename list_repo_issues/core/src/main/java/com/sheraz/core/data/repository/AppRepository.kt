@@ -3,6 +3,17 @@ package com.sheraz.core.data.repository
 import androidx.lifecycle.LiveData
 import com.sheraz.core.data.db.entity.GitHubRepoIssueEntity
 
+/**
+ * An interface that is responsible to provide methods for
+ * interacting with different data sources like NetworkDataSource
+ * & Database/Local Cache.
+ *
+ * Following the principle of `Programming to an interface`,
+ * this interface is used to provide methods that any
+ * implementation class must provide in order for other
+ * application components to work seamlessly.
+ */
+
 interface AppRepository {
 
     val isFetchInProgress: LiveData<Boolean>

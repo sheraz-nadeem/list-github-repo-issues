@@ -9,6 +9,12 @@ import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton
 
+/**
+ * Module responsible for providing [AppRepository] instance
+ * This module will provide more instances if any other
+ * repository are created in future.
+ */
+
 @Module
 class RepositoryModule {
 

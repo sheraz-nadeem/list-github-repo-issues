@@ -5,6 +5,10 @@ import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton
 
+/**
+ * Module responsible for providing [Logger] instance
+ */
+
 @Module
 class LoggerModule {
 

@@ -8,6 +8,10 @@ import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
 import com.sheraz.core.utils.Logger
 
+/**
+ * An abstract base class for all the activities in our app
+ */
+
 abstract class BaseActivity<VIEW_DATA_BINDING : ViewDataBinding, VIEW_MODEL : BaseViewModel> : AppCompatActivity() {
 
     private lateinit var progressDialog: Dialog

@@ -7,7 +7,9 @@ import androidx.room.RoomDatabase
 import com.sheraz.core.data.db.dao.GitHubRepoIssueEntityDao
 import com.sheraz.core.data.db.entity.GitHubRepoIssueEntity
 
-
+/**
+ * Our Room Database class with [GitHubRepoIssueEntity]
+ */
 @Database(
     entities = [GitHubRepoIssueEntity::class],
     version = 1,

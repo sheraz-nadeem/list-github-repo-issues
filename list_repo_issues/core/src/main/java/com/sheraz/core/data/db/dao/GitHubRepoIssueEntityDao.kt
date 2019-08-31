@@ -7,6 +7,12 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.sheraz.core.data.db.entity.GitHubRepoIssueEntity
 
+/**
+ * An Interface that is used to generate an implementation
+ * that provides convenience methods to perform Room database
+ * operations on `github_repo_issue` table.
+ */
+
 @Dao
 interface GitHubRepoIssueEntityDao {
 

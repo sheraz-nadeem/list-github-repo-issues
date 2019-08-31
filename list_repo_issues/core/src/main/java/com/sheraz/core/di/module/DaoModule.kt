@@ -5,6 +5,9 @@ import com.sheraz.core.data.db.dao.GitHubRepoIssueEntityDao
 import dagger.Module
 import dagger.Provides
 
+/**
+ * Module responsible for providing [GitHubRepoIssueEntityDao] instance
+ */
 
 @Module
 class DaoModule {

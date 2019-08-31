@@ -5,6 +5,10 @@ import com.sheraz.listgithubrepoissues.ui.modules.home.HomeViewModel
 import dagger.Module
 import dagger.Provides
 
+/**
+ * Module responsible for providing [HomeViewModel] instance
+ */
+
 @Module
 class HomeModule {
 

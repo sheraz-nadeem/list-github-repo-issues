@@ -12,6 +12,10 @@ import dagger.Component
 import retrofit2.Retrofit
 import javax.inject.Singleton
 
+/**
+ * A Dagger Component that is responsible for
+ * providing core/data dependencies
+ */
 
 @Singleton
 @Component(

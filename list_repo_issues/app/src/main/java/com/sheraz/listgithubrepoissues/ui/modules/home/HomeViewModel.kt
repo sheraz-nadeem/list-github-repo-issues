@@ -13,6 +13,11 @@ import kotlinx.coroutines.launch
 import java.net.URLDecoder
 import java.net.URLEncoder
 
+/**
+ * ViewModel that is used by our HomeActivity
+ * to maintain its state.
+ */
+
 class HomeViewModel(
     private val appRepository: AppRepository
 ): BaseViewModel() {
