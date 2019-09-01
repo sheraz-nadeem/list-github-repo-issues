@@ -16,31 +16,57 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-            android:id="@+id/swipeRefreshLayout"
+        <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rvGitHubRepoIssuesList"
+            <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+                android:id="@+id/swipeRefreshLayout"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:paddingStart="@dimen/dimen_5"
-                android:paddingLeft="@dimen/dimen_5"
-                android:paddingEnd="@dimen/dimen_5"
-                android:paddingRight="@dimen/dimen_5"
-                android:scrollbarStyle="insideOverlay"
-                android:scrollbars="vertical" />
+                android:layout_height="match_parent">
 
-        </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rvGitHubRepoIssuesList"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:paddingStart="@dimen/dimen_5"
+                    android:paddingLeft="@dimen/dimen_5"
+                    android:paddingEnd="@dimen/dimen_5"
+                    android:paddingRight="@dimen/dimen_5"
+                    android:scrollbarStyle="insideOverlay"
+                    android:scrollbars="vertical" />
 
-        <androidx.core.widget.ContentLoadingProgressBar
-            android:id="@+id/pbLoading"
-            style="?android:attr/progressBarStyleLarge"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:visibility="@{homeViewModel.getIsLoading() ? View.VISIBLE : View.GONE}" />
+            </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+            <androidx.core.widget.ContentLoadingProgressBar
+                android:id="@+id/pbLoading"
+                style="?android:attr/progressBarStyleLarge"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:visibility="@{homeViewModel.getIsLoading() ? View.VISIBLE : View.GONE}" />
+
+            <LinearLayout
+                android:id="@+id/llNoData"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:layout_gravity="center_vertical"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <com.sheraz.core.widgets.TextViewArcaHeavy
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAllCaps="true"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                    android:textColor="@color/colorSecondaryText"
+                    android:textSize="@dimen/text_size_large"
+                    android:text="No Data" />
+
+            </LinearLayout>
+
+        </FrameLayout>
 
     </merge>
 

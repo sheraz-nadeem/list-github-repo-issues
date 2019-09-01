@@ -3,6 +3,7 @@ package com.sheraz.listgithubrepoissues.ui.modules.home
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.paging.PagedList
@@ -73,6 +74,7 @@ class HomeActivity : BaseActivityToolbar<ActivityHomeBinding, HomeViewModel>() {
 
         logger.d(TAG, "initUI(): ")
         setUpActionBar()
+        llNoData.visibility = View.GONE
         rvGitHubRepoIssuesList.layoutManager = LinearLayoutManager(this)
         rvGitHubRepoIssuesList.adapter = homeAdapter
 
@@ -107,6 +109,11 @@ class HomeActivity : BaseActivityToolbar<ActivityHomeBinding, HomeViewModel>() {
         homeAdapter.submitList(pagedList)
         swipeRefreshLayout.isRefreshing = isRefreshing
 
+        val pagedListSize: Int = pagedList?.size ?: 0
+        if (pagedListSize > 0) {
+            llNoData.visibility = View.GONE
+        }
+
     }
 
     private fun handleFetchInProgress(isFetchInProgress: Boolean) {
@@ -115,6 +122,8 @@ class HomeActivity : BaseActivityToolbar<ActivityHomeBinding, HomeViewModel>() {
         homeViewModel.setIsLoading(isFetchInProgress)
         swipeRefreshLayout.isRefreshing = false
 
+        if (isFetchInProgress) llNoData.visibility = View.GONE
+
     }
 
     private fun handleNetworkError(exception: Exception) {
@@ -122,6 +131,10 @@ class HomeActivity : BaseActivityToolbar<ActivityHomeBinding, HomeViewModel>() {
         logger.d(TAG, "handleNetworkError(): exception: $exception")
         swipeRefreshLayout.isRefreshing = false
         Snackbar.make(activityHomeBinding?.root!!, exception.message.toString(), Snackbar.LENGTH_LONG).show()
+
+        if (homeAdapter.currentList?.isEmpty()!!) {
+            llNoData.visibility = View.VISIBLE
+        }
 
     }
 

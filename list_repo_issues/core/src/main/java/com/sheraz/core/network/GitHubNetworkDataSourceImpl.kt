@@ -1,7 +1,10 @@
 package com.sheraz.core.network
 
 import com.sheraz.core.data.db.entity.GitHubRepoIssueEntity
+import com.sheraz.core.network.response.Result
 import com.sheraz.core.utils.Logger
+import com.sheraz.core.utils.safeApiCall
+import java.io.IOException
 
 
 /**
@@ -27,12 +30,13 @@ class GitHubNetworkDataSourceImpl(
      *
      * @return List<GitHubRepoIssueEntity> list of entity objects
      */
-    override suspend fun loadRepoIssuesFromNetwork(ownerName: String, repoName: String, pageSize: Int, page: Int): List<GitHubRepoIssueEntity> {
-
-        logger.d(TAG, "loadRepoIssuesFromNetwork(): ownerName: $ownerName, repoName: $repoName, pageSize: $pageSize, page: $page")
-        return fetchRepoIssuesFromNetwork(ownerName, repoName, pageSize, page)
-
-    }
+    override suspend fun loadRepoIssuesFromNetwork(ownerName: String,
+                                                   repoName: String,
+                                                   pageSize: Int,
+                                                   page: Int) = safeApiCall(
+        networkBlock = { fetchRepoIssuesFromNetwork(ownerName, repoName, pageSize, page) },
+        errorMessage = "Unable to load repository issues"
+    )
 
     /**
      * Private method to get Repos using
@@ -46,7 +50,7 @@ class GitHubNetworkDataSourceImpl(
      *
      * @return List<GitHubRepoIssueEntity> list of entity objects
      */
-    private suspend fun fetchRepoIssuesFromNetwork(ownerName: String, repoName: String, pageSize: Int, page: Int): List<GitHubRepoIssueEntity> {
+    private suspend fun fetchRepoIssuesFromNetwork(ownerName: String, repoName: String, pageSize: Int, page: Int): Result<List<GitHubRepoIssueEntity>> {
 
         logger.d(TAG, "fetchRepoIssuesFromNetwork(): ownerName: $ownerName, repoName: $repoName, pageSize: $pageSize, page: $page")
 
@@ -56,12 +60,12 @@ class GitHubNetworkDataSourceImpl(
 
             val responseBody = response.body()
             if (responseBody != null) {
-                return responseBody
+                return Result.Success(responseBody)
             }
 
         }
 
-        return emptyList()
+        return Result.Error(IOException(" Throwing exception ${response.code()} ${response.message()}"))
     }
 
     companion object {

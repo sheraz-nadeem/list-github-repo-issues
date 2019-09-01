@@ -6,6 +6,7 @@ import com.sheraz.core.data.db.dao.GitHubRepoIssueEntityDao
 import com.sheraz.core.data.db.entity.GitHubRepoIssueEntity
 import com.sheraz.core.network.GitHubNetworkDataSource
 import com.sheraz.core.network.response.GetGitHubRepoIssuesResponse
+import com.sheraz.core.network.response.Result
 import com.sheraz.core.utils.Logger
 import kotlin.Exception
 
@@ -87,31 +88,30 @@ class AppRepositoryImpl(
     /**
      * Method that sends request using [GitHubNetworkDataSource] and also persist data in local cache
      */
-    override suspend fun loadGitHubRepoIssuesList(ownerName: String, repoName: String, pageSize: Int, page: Int) {
+    override suspend fun loadGitHubRepoIssuesList(ownerName: String,
+                                                  repoName: String,
+                                                  pageSize: Int,
+                                                  page: Int) {
         logger.d(TAG, "loadGitHubRepoIssuesList(): ")
         fetchGitHubRepoIssuesAndPersist(ownerName, repoName, pageSize, page)
     }
 
-//    /**
-//     * Method that refreshes list of call recordings
-//     */
-//    override suspend fun refreshGitHubRepoIssuesList(ownerName: String, repoName: String) {
-//        logger.d(TAG, "refreshCallRecordingsList(): ")
-//        fetchGitHubRepoIssuesAndPersist(ownerName, repoName, AppRepository.NETWORK_PAGE_SIZE, -1)
-//    }
-
     /**
      * Method that initiates network request and also persists data in local cache
      */
-    private suspend fun fetchGitHubRepoIssuesAndPersist(ownerName: String = "", repoName: String = "", pageSize: Int = AppRepository.NETWORK_PAGE_SIZE, page: Int = 1) {
+    private suspend fun fetchGitHubRepoIssuesAndPersist(ownerName: String = "",
+                                                        repoName: String = "",
+                                                        pageSize: Int = AppRepository.NETWORK_PAGE_SIZE,
+                                                        page: Int = 1) {
 
         logger.d(TAG,"fetchGitHubRepoIssuesAndPersist(): ")
 
         val response = fetchRepoIssuesFromNetworkAndPersist(ownerName, repoName, pageSize, page)
-        if (response != null) {
-            logger.d(TAG,"fetchGitHubRepoIssuesAndPersist(): response is success")
-            _isFetchInProgress.postValue(false)
-            persistDownloadedGitHubRepoIssuesList(response)
+        _isFetchInProgress.postValue(false)
+
+        when (response) {
+            is Result.Success -> persistDownloadedGitHubRepoIssuesList(response.data)
+            is Result.Error -> _networkError.postValue(response.exception)
         }
 
     }
@@ -120,7 +120,10 @@ class AppRepositoryImpl(
      * Method that sends request using [GitHubNetworkDataSource] and returns
      * [GetGitHubRepoIssuesResponse] response wrapped inside [Result]
      */
-    private suspend fun fetchRepoIssuesFromNetworkAndPersist(ownerName: String = "", repoName: String = "", pageSize: Int = AppRepository.NETWORK_PAGE_SIZE, page: Int = 1): List<GitHubRepoIssueEntity> {
+    private suspend fun fetchRepoIssuesFromNetworkAndPersist(ownerName: String = "",
+                                                             repoName: String = "",
+                                                             pageSize: Int = AppRepository.NETWORK_PAGE_SIZE,
+                                                             page: Int = 1): Result<List<GitHubRepoIssueEntity>> {
 
         logger.d(TAG, "fetchRepoIssuesFromNetworkAndPersist(): ownerName: $ownerName, repoName: $repoName, pageSize: $pageSize, page: $page")
 
@@ -156,9 +159,7 @@ class AppRepositoryImpl(
 
     }
 
-    private fun getNumOfRows(): Int {
-        return gitHubRepoIssueEntityDao.getNumOfRows()
-    }
+    private fun getNumOfRows() = gitHubRepoIssueEntityDao.getNumOfRows()
 
     private fun getActualPageSize(page: Int, numOfRows: Int): Int {
         return when (page > 0) {

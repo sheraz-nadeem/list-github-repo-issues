@@ -1,6 +1,7 @@
 package com.sheraz.core.network
 
 import com.sheraz.core.data.db.entity.GitHubRepoIssueEntity
+import com.sheraz.core.network.response.Result
 
 /**
  * An interface that is responsible to provide methods for
@@ -14,7 +15,7 @@ import com.sheraz.core.data.db.entity.GitHubRepoIssueEntity
 
 interface GitHubNetworkDataSource {
 
-    suspend fun loadRepoIssuesFromNetwork(ownerName: String, repoName: String, pageSize: Int, page: Int): List<GitHubRepoIssueEntity>
+    suspend fun loadRepoIssuesFromNetwork(ownerName: String, repoName: String, pageSize: Int, page: Int): Result<List<GitHubRepoIssueEntity>>
 
     companion object {
         const val ERROR_MESSAGE = "Error loading github repos data"
