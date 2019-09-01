@@ -1,5 +1,6 @@
 package com.sheraz.core.network
 
+import com.sheraz.core.data.db.entity.GitHubRepoEntity
 import com.sheraz.core.data.db.entity.GitHubRepoIssueEntity
 import kotlinx.coroutines.Deferred
 import retrofit2.Response
@@ -31,6 +32,22 @@ interface GitHubApiService {
         @Query("per_page") pageSize: Int,
         @Query("page") page: Int
     ): Deferred<Response<List<GitHubRepoIssueEntity>>>
+
+
+    /**
+     * @param query String Search query for GitHub, usually in Repository Name & Description
+     * @param pageSize Int count for number of items to include in response
+     * @param page Int used for page number
+     *
+     * @return Returns {@see kotlinx.coroutines.Deferred} value
+     * that has a result of type {@see retrofit2.Response}
+     */
+    @GET("/search/repositories")
+    fun searchReposAsync(
+        @Query("q") query: String,
+        @Query("per_page") pageSize: Int,
+        @Query("page") page: Int
+    ): Deferred<Response<List<GitHubRepoEntity>>>
 
 
     companion object {

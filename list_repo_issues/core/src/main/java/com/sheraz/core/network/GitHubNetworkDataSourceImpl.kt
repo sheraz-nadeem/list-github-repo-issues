@@ -1,5 +1,6 @@
 package com.sheraz.core.network
 
+import com.sheraz.core.data.db.entity.GitHubRepoEntity
 import com.sheraz.core.data.db.entity.GitHubRepoIssueEntity
 import com.sheraz.core.network.response.Result
 import com.sheraz.core.utils.Logger
@@ -61,6 +62,55 @@ class GitHubNetworkDataSourceImpl(
 
         if (response?.isSuccessful) {
             logger.i(TAG, "fetchRepoIssuesFromNetwork(): response is successful")
+            val responseBody = response.body()
+            if (responseBody != null) {
+                return Result.Success(responseBody)
+            }
+
+        }
+
+        return Result.Error(IOException(" Throwing exception ${response.code()} ${response.message()}"))
+    }
+
+    /**
+     * Public method to initiate network request. Since, we are
+     * doing IO operations with API using Retrofit, this method should
+     * be a suspend function and called from a coroutine or another suspend function.
+     *
+     * @param query String Search query for GitHub, usually in Repository Name & Description
+     * @param pageSize Int count for number of items to include in response
+     * @param page Int used for page number
+     *
+     * @return List<GitHubRepoEntity> list of entity objects
+     */
+    override suspend fun loadReposFromNetwork(query: String,
+                                                   pageSize: Int,
+                                                   page: Int) = safeApiCall(
+        networkBlock = { fetchReposFromNetwork(query, pageSize, page) },
+        errorMessage = "Unable to load repository issues"
+    )
+
+    /**
+     * Private method to get Repos using
+     * {@see com.sheraz.core.network.GitHubApiService#searchReposAsync} and return
+     * the received list of GitHub Repository issues
+     *
+     * @param query String Search query for GitHub, usually in Repository Name & Description
+     * @param pageSize Int count for number of items to include in response
+     * @param page Int used for page number
+     *
+     * @return List<GitHubRepoEntity> list of entity objects
+     */
+    private suspend fun fetchReposFromNetwork(query: String,
+                                                   pageSize: Int,
+                                                   page: Int): Result<List<GitHubRepoEntity>> {
+
+        logger.d(TAG, "fetchReposFromNetwork(): query: $query, pageSize: $pageSize, page: $page")
+
+        val response = gitHubApiService.searchReposAsync(query, pageSize, page).await()
+
+        if (response?.isSuccessful) {
+            logger.i(TAG, "fetchReposFromNetwork(): response is successful")
             val responseBody = response.body()
             if (responseBody != null) {
                 return Result.Success(responseBody)

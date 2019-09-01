@@ -1,5 +1,6 @@
 package com.sheraz.core.network
 
+import com.sheraz.core.data.db.entity.GitHubRepoEntity
 import com.sheraz.core.data.db.entity.GitHubRepoIssueEntity
 import com.sheraz.core.network.response.Result
 
@@ -16,6 +17,7 @@ import com.sheraz.core.network.response.Result
 interface GitHubNetworkDataSource {
 
     suspend fun loadRepoIssuesFromNetwork(ownerName: String, repoName: String, pageSize: Int, page: Int): Result<List<GitHubRepoIssueEntity>>
+    suspend fun loadReposFromNetwork(query: String, pageSize: Int, page: Int): Result<List<GitHubRepoEntity>>
 
     companion object {
         const val ERROR_MESSAGE = "Error loading github repos data"
