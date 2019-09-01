@@ -18,6 +18,7 @@ import com.sheraz.listgithubrepoissues.extensions.findFragmentByTag
 import com.sheraz.listgithubrepoissues.ui.models.GitHubRepoIssueItem
 import com.sheraz.listgithubrepoissues.ui.modules.adapters.HomeAdapter
 import com.sheraz.listgithubrepoissues.ui.modules.base.BaseActivityToolbar
+import com.sheraz.listgithubrepoissues.ui.modules.home.detail.GoToDetailBottomSheetDialogFragment
 import kotlinx.android.synthetic.main.activity_home.*
 
 /**
