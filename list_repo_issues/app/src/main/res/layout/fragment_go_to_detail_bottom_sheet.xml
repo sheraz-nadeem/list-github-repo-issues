@@ -1,0 +1,184 @@
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:background="@android:color/white">
+
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/dimen_50"
+            android:background="@color/colorAccent">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/colorAccent"
+                android:gravity="center"
+                android:textColor="@android:color/white"
+                android:textSize="@dimen/text_size_medium"
+                android:text="Issue Detail"/>
+
+                <ImageButton
+                    android:id="@+id/ibDoneAction"
+                    android:layout_width="@dimen/dimen_50"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="end"
+                    android:background="@android:color/transparent"
+                    app:srcCompat="@drawable/ic_done_white" />
+
+        </FrameLayout>
+
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/dimen_5"
+            android:orientation="vertical">
+
+
+            <com.sheraz.core.widgets.TextViewArcaHeavy
+                android:id="@+id/tvIssueTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="4"
+                android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                android:textColor="@color/colorSecondaryText"
+                android:textSize="@dimen/text_size_medium"
+                tools:text="Issue Title" />
+
+            <com.sheraz.core.widgets.TextViewNormal
+                android:id="@+id/tvIssueBody"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/dimen_5"
+                android:maxLines="12"
+                android:ellipsize="end"
+                android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                android:textColor="@color/colorDarkText"
+                android:textSize="@dimen/text_size_moderate"
+                tools:text="Issue body" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/dimen_5"
+            android:gravity="center_vertical"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:paddingTop="@dimen/dimen_2"
+                android:paddingBottom="@dimen/dimen_2">
+
+                <com.sheraz.core.widgets.TextViewNormal
+                    android:layout_width="@dimen/dimen_100"
+                    android:layout_height="wrap_content"
+                    android:text="Author"
+                    android:textColor="@color/colorDarkText"
+                    android:textSize="@dimen/text_size_moderate" />
+
+                <com.sheraz.core.widgets.TextViewNormal
+                    android:id="@+id/tvAuthorLogin"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    tools:text="Author Login Name"
+                    android:textColor="@color/colorDarkText"
+                    android:textSize="@dimen/text_size_moderate"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:paddingTop="@dimen/dimen_2"
+                android:paddingBottom="@dimen/dimen_2">
+
+                <com.sheraz.core.widgets.TextViewNormal
+                    android:layout_width="@dimen/dimen_100"
+                    android:layout_height="wrap_content"
+                    android:text="State"
+                    android:textColor="@color/colorDarkText"
+                    android:textSize="@dimen/text_size_moderate" />
+
+                <com.sheraz.core.widgets.TextViewNormal
+                    android:id="@+id/tvIssueState"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:maxLines="3"
+                    android:ellipsize="end"
+                    android:textColor="@color/colorDarkText"
+                    android:textSize="@dimen/text_size_moderate" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:paddingTop="@dimen/dimen_2"
+                android:paddingBottom="@dimen/dimen_2">
+
+                <com.sheraz.core.widgets.TextViewNormal
+                    android:layout_width="@dimen/dimen_100"
+                    android:layout_height="wrap_content"
+                    android:text="Created At"
+                    android:textColor="@color/colorDarkText"
+                    android:textSize="@dimen/text_size_moderate" />
+
+                <com.sheraz.core.widgets.TextViewNormal
+                    android:id="@+id/tvCreatedAt"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    tools:text="Thursday Sep 12, 2013 at 22:42 GMT"
+                    android:textColor="@color/colorDarkText"
+                    android:textAllCaps="true"
+                    android:textStyle="bold|italic"
+                    android:textSize="@dimen/text_size_small1" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingTop="@dimen/dimen_2"
+                android:paddingBottom="@dimen/dimen_2">
+
+                <com.sheraz.core.widgets.TextViewNormal
+                    android:layout_width="@dimen/dimen_100"
+                    android:layout_height="wrap_content"
+                    android:text="Author Association"
+                    android:textColor="@color/colorDarkText"
+                    android:textSize="@dimen/text_size_moderate" />
+
+                <com.sheraz.core.widgets.TextViewNormal
+                    android:id="@+id/tvAuthorAssociation"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    tools:text="Contributor"
+                    android:textColor="@color/colorDarkText"
+                    android:textAllCaps="true"
+                    android:textStyle="bold|italic"
+                    android:textSize="@dimen/text_size_moderate" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</layout>

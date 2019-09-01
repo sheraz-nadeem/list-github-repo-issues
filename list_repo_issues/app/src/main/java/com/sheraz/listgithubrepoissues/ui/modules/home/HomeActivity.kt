@@ -5,10 +5,8 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
 import androidx.paging.PagedList
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
 import com.sheraz.core.data.repository.AppRepository
 import com.sheraz.listgithubrepoissues.BR
@@ -16,11 +14,11 @@ import com.sheraz.listgithubrepoissues.R
 import com.sheraz.listgithubrepoissues.databinding.ActivityHomeBinding
 import com.sheraz.listgithubrepoissues.di.Injector
 import com.sheraz.listgithubrepoissues.extensions.bindViewModel
+import com.sheraz.listgithubrepoissues.extensions.findFragmentByTag
 import com.sheraz.listgithubrepoissues.ui.models.GitHubRepoIssueItem
 import com.sheraz.listgithubrepoissues.ui.modules.adapters.HomeAdapter
 import com.sheraz.listgithubrepoissues.ui.modules.base.BaseActivityToolbar
 import kotlinx.android.synthetic.main.activity_home.*
-import kotlinx.android.synthetic.main.app_toolbar.*
 
 /**
  * HomeActivity class for our Home view.
@@ -143,6 +141,11 @@ class HomeActivity : BaseActivityToolbar<ActivityHomeBinding, HomeViewModel>() {
         logger.d(TAG, "setUpListeners(): ")
         swipeRefreshLayout.setOnRefreshListener { homeViewModel.onRefresh(ownerName, repoName) }
 
+        homeAdapter.setListener(View.OnClickListener {
+            if (it.tag != null) {
+                openGoToDetailBottomSheet(it.tag as GitHubRepoIssueItem)
+            }
+        })
     }
 
     private fun handleClearCache() {
@@ -153,6 +156,19 @@ class HomeActivity : BaseActivityToolbar<ActivityHomeBinding, HomeViewModel>() {
         homeAdapter.currentList?.dataSource?.invalidate()
         homeViewModel.buildLivePagedList()
         homeViewModel.pagedListLiveData?.observe(this, pagedListObserver)
+
+    }
+
+    private fun openGoToDetailBottomSheet(gitHubRepoIssueItem: GitHubRepoIssueItem) {
+
+        logger.d(TAG, "openGoToDetailBottomSheet(): gitHubRepoIssueItem: $gitHubRepoIssueItem")
+
+        var fragment: GoToDetailBottomSheetDialogFragment? = findFragmentByTag(GoToDetailBottomSheetDialogFragment.TAG)
+
+        fragment?.dismiss()
+
+        fragment = GoToDetailBottomSheetDialogFragment.newInstance(gitHubRepoIssueItem)
+        fragment.show(supportFragmentManager, GoToDetailBottomSheetDialogFragment.TAG)
 
     }
 

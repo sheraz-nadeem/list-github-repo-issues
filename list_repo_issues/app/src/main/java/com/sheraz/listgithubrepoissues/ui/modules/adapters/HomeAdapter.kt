@@ -75,11 +75,10 @@ class HomeAdapter (
 
         private fun handleClicks() {
 
-            itemView.setOnLongClickListener {
+            itemView.setOnClickListener {
 
-                logger.d(TAG, "OnLongClickListener: position: $adapterPosition")
+                logger.d(TAG, "OnClickListener: position: $adapterPosition")
                 mListener?.onClick(it)
-                return@setOnLongClickListener true
 
             }
         }
