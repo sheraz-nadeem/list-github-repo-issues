@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">ListGitHubRepoIssues</string>
+
+    <string name="clear_local_db_cache_menu_text">Clear local cache</string>
 </resources>

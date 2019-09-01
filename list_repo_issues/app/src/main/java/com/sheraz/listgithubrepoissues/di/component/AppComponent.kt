@@ -5,6 +5,7 @@ import com.sheraz.core.di.scope.FeatureScope
 import com.sheraz.listgithubrepoissues.di.module.CoroutinesDispatcherProviderModule
 import com.sheraz.listgithubrepoissues.di.module.HomeModule
 import com.sheraz.listgithubrepoissues.di.module.ViewModelFactoryProviderModule
+import com.sheraz.listgithubrepoissues.ui.modules.adapters.HomeAdapter
 import com.sheraz.listgithubrepoissues.ui.modules.home.HomeViewModel
 import com.sheraz.listgithubrepoissues.ui.modules.home.HomeViewModelFactory
 import dagger.Component
@@ -24,6 +25,7 @@ import dagger.Component
 )
 @FeatureScope
 interface AppComponent {
+    fun homeAdapter(): HomeAdapter
     fun homeViewModel(): HomeViewModel
     fun homeViewModelFactory(): HomeViewModelFactory
 }

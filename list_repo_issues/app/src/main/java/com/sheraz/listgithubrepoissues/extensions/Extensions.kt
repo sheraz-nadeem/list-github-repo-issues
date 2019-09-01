@@ -18,6 +18,8 @@ fun GitHubRepoIssueEntity.toUiModel(): GitHubRepoIssueItem {
         authorLogin = user?.login,
         createdAt = createdAt,
         repositoryUrl = repositoryUrl,
-        comments = comments
+        comments = comments,
+        authorAvatarUrl = user?.avatarUrl,
+        authorAssociation = authorAssociation
     )
 }

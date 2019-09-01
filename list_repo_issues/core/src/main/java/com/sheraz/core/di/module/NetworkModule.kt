@@ -9,6 +9,8 @@ import com.sheraz.core.network.GitHubNetworkDataSource
 import com.sheraz.core.network.GitHubNetworkDataSourceImpl
 import com.sheraz.core.network.HttpLogger
 import com.sheraz.core.utils.Logger
+import com.squareup.picasso.OkHttp3Downloader
+import com.squareup.picasso.Picasso
 import dagger.Module
 import dagger.Provides
 import okhttp3.Cache
@@ -49,6 +51,16 @@ class NetworkModule {
             .addInterceptor(httpLoggingInterceptor)
             .cache(cache)
             .build()
+    }
+
+    @Provides
+    @Singleton
+    fun provideOkHttp3Downloader(okHttpClient: OkHttpClient): OkHttp3Downloader = OkHttp3Downloader(okHttpClient)
+
+    @Provides
+    @Singleton
+    fun providePicasso(context: Context, okHttp3Downloader: OkHttp3Downloader): Picasso {
+        return Picasso.Builder(context).downloader(okHttp3Downloader).build()
     }
 
     @Provides

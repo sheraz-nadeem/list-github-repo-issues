@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="@dimen/dimen_3"
+    android:orientation="vertical"
+    app:cardBackgroundColor="@android:color/white"
+    app:cardCornerRadius="@dimen/dimen_2"
+    app:cardElevation="@dimen/dimen_3">
+
+    <LinearLayout
+        android:id="@+id/llRootContainer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="@dimen/dimen_5">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="@dimen/dimen_3">
+
+            <androidx.cardview.widget.CardView
+                android:layout_width="@dimen/dimen_75"
+                android:layout_height="@dimen/dimen_75"
+                android:layout_margin="@dimen/dimen_3"
+                app:cardCornerRadius="@dimen/dimen_5"
+                app:cardElevation="@dimen/dimen_3">
+
+                <ImageView
+                    android:id="@+id/ivAuthorAvatar"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center" />
+
+            </androidx.cardview.widget.CardView>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/dimen_5"
+                android:layout_marginLeft="@dimen/dimen_5"
+                android:layout_marginEnd="@dimen/dimen_5"
+                android:layout_marginRight="@dimen/dimen_5"
+                android:orientation="vertical">
+
+
+                <com.sheraz.core.widgets.TextViewArcaHeavy
+                    android:id="@+id/tvIssueTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:ellipsize="end"
+                    android:maxLines="2"
+                    android:textAllCaps="true"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                    android:textColor="@color/colorSecondaryText"
+                    android:textSize="@dimen/text_size_small"
+                    tools:text="Issue Title" />
+
+                <com.sheraz.core.widgets.TextViewNormal
+                    android:id="@+id/tvIssueBody"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:maxLines="4"
+                    android:ellipsize="end"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                    android:textColor="@color/colorDarkText"
+                    android:textSize="@dimen/text_size_smaller"
+                    tools:text="Issue body" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/dimen_3"
+            android:gravity="center_vertical"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:paddingTop="@dimen/dimen_2"
+                android:paddingBottom="@dimen/dimen_2">
+
+                <com.sheraz.core.widgets.TextViewNormal
+                    android:layout_width="@dimen/dimen_80"
+                    android:layout_height="wrap_content"
+                    android:text="Author"
+                    android:textColor="@color/colorDarkText"
+                    android:textSize="@dimen/text_size_smallest" />
+
+                <com.sheraz.core.widgets.TextViewNormal
+                    android:id="@+id/tvAuthorLogin"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    tools:text="Author Login Name"
+                    android:textColor="@color/colorDarkText"
+                    android:textSize="@dimen/text_size_smallest"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:paddingTop="@dimen/dimen_2"
+                android:paddingBottom="@dimen/dimen_2">
+
+                <com.sheraz.core.widgets.TextViewNormal
+                    android:layout_width="@dimen/dimen_80"
+                    android:layout_height="wrap_content"
+                    android:text="State"
+                    android:textColor="@color/colorDarkText"
+                    android:textSize="@dimen/text_size_smallest" />
+
+                <com.sheraz.core.widgets.TextViewNormal
+                    android:id="@+id/tvIssueState"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:maxLines="3"
+                    android:ellipsize="end"
+                    android:textColor="@color/colorDarkText"
+                    android:textSize="@dimen/text_size_smallest" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:paddingTop="@dimen/dimen_2"
+                android:paddingBottom="@dimen/dimen_2">
+
+                <com.sheraz.core.widgets.TextViewNormal
+                    android:layout_width="@dimen/dimen_80"
+                    android:layout_height="wrap_content"
+                    android:text="Created At"
+                    android:textColor="@color/colorDarkText"
+                    android:textSize="@dimen/text_size_smallest" />
+
+                <com.sheraz.core.widgets.TextViewNormal
+                    android:id="@+id/tvCreatedAt"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    tools:text="Thursday Sep 12, 2013 at 22:42 GMT"
+                    android:textColor="@color/colorDarkText"
+                    android:textAllCaps="true"
+                    android:textStyle="bold|italic"
+                    android:textSize="@dimen/text_size_smallest" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingTop="@dimen/dimen_2"
+                android:paddingBottom="@dimen/dimen_2">
+
+                <com.sheraz.core.widgets.TextViewNormal
+                    android:layout_width="@dimen/dimen_80"
+                    android:layout_height="wrap_content"
+                    android:text="Author Association"
+                    android:textColor="@color/colorDarkText"
+                    android:textSize="@dimen/text_size_smallest" />
+
+                <com.sheraz.core.widgets.TextViewNormal
+                    android:id="@+id/tvAuthorAssociation"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    tools:text="Contributor"
+                    android:textColor="@color/colorDarkText"
+                    android:textAllCaps="true"
+                    android:textStyle="bold|italic"
+                    android:textSize="@dimen/text_size_smallest" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </LinearLayout>
+</androidx.cardview.widget.CardView>

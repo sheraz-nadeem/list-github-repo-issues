@@ -52,7 +52,7 @@ class GitHubNetworkDataSourceImpl(
 
         val response = gitHubApiService.getRepoIssuesAsync(ownerName, repoName, pageSize, page).await()
 
-        if (response.isSuccessful) {
+        if (response?.isSuccessful) {
 
             val responseBody = response.body()
             if (responseBody != null) {

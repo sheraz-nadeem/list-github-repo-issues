@@ -30,13 +30,19 @@ class AppRepositoryImpl(
     override val networkError: LiveData<Exception>
         get() = _networkError
 
+    private val _noMoreItemsAvailable = MutableLiveData<Boolean>().apply { postValue(false) }
+    override val noMoreItemsAvailable: LiveData<Boolean>
+        get() = _noMoreItemsAvailable
+
 
     init {
         logger.d(TAG, "init(): ")
     }
 
+    override fun getAllReposPagedFactory() = gitHubRepoIssueEntityDao.getAllRepoIssuesPaged()
+
     /**
-     * Method to return incoming & outgoing call recordings live data
+     * Method to return all issues live data
      */
     override fun getAllRepoIssuesLiveData(): LiveData<List<GitHubRepoIssueEntity>> {
         logger.d(TAG, "getAllRepoIssuesLiveData(): ")
@@ -44,7 +50,7 @@ class AppRepositoryImpl(
     }
 
     /**
-     * Method to return only incoming call recordings live data
+     * Method to return only open issues live data
      */
     override fun getOpenIssuesLiveData(): LiveData<List<GitHubRepoIssueEntity>> {
         logger.d(TAG, "getOpenIssuesLiveData(): ")
@@ -52,7 +58,7 @@ class AppRepositoryImpl(
     }
 
     /**
-     * Method to return only outgoing call recordings live data
+     * Method to return only closed issues live data
      */
     override fun getClosedIssuesLiveData(): LiveData<List<GitHubRepoIssueEntity>> {
         logger.d(TAG, "getClosedIssuesLiveData(): ")
@@ -86,13 +92,13 @@ class AppRepositoryImpl(
         fetchGitHubRepoIssuesAndPersist(ownerName, repoName, pageSize, page)
     }
 
-    /**
-     * Method that refreshes list of call recordings
-     */
-    override suspend fun refreshGitHubRepoIssuesList() {
-        logger.d(TAG, "refreshCallRecordingsList(): ")
-        fetchGitHubRepoIssuesAndPersist("", "", AppRepository.NETWORK_PAGE_SIZE, -1)
-    }
+//    /**
+//     * Method that refreshes list of call recordings
+//     */
+//    override suspend fun refreshGitHubRepoIssuesList(ownerName: String, repoName: String) {
+//        logger.d(TAG, "refreshCallRecordingsList(): ")
+//        fetchGitHubRepoIssuesAndPersist(ownerName, repoName, AppRepository.NETWORK_PAGE_SIZE, -1)
+//    }
 
     /**
      * Method that initiates network request and also persists data in local cache
@@ -135,6 +141,8 @@ class AppRepositoryImpl(
         logger.d(TAG,"persistDownloadedGitHubRepoIssuesList(): gitHubRepoIssueEntityList.size: ${gitHubRepoIssueEntityList.size}")
 
         try {
+
+            if (gitHubRepoIssueEntityList.size < AppRepository.NETWORK_PAGE_SIZE) _noMoreItemsAvailable.postValue(true)
 
             if (gitHubRepoIssueEntityList.isNotEmpty()) {
                 gitHubRepoIssueEntityDao.insertList(gitHubRepoIssueEntityList)

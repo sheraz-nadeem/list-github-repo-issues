@@ -8,6 +8,7 @@ import com.sheraz.core.di.module.*
 import com.sheraz.core.network.GitHubApiService
 import com.sheraz.core.network.GitHubNetworkDataSource
 import com.sheraz.core.utils.Logger
+import com.squareup.picasso.Picasso
 import dagger.Component
 import retrofit2.Retrofit
 import javax.inject.Singleton
@@ -35,6 +36,7 @@ interface CoreComponent {
     fun retrofit(): Retrofit
     fun gitHubRepoApiService(): GitHubApiService
     fun gitHubNetworkDataSource(): GitHubNetworkDataSource
+    fun picasso(): Picasso
     fun appRepository(): AppRepository
     fun logger(): Logger
 }

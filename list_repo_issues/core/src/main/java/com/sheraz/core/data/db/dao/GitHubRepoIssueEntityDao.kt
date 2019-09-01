@@ -1,6 +1,7 @@
 package com.sheraz.core.data.db.dao
 
 import androidx.lifecycle.LiveData
+import androidx.paging.DataSource
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
@@ -21,6 +22,9 @@ interface GitHubRepoIssueEntityDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertList(gitHubRepoEntityList: List<GitHubRepoIssueEntity>)
+
+    @Query("SELECT * FROM github_repo_issue")
+    fun getAllRepoIssuesPaged(): DataSource.Factory<Int, GitHubRepoIssueEntity>
 
     @Query("SELECT * FROM github_repo_issue")
     fun getAllRepoIssues(): LiveData<List<GitHubRepoIssueEntity>>

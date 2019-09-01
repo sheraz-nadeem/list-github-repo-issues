@@ -4,6 +4,7 @@ dependencies {
 
     // AndroidX
     implementation "androidx.core:core:$rootProject.androidXCoreVersion"
+    implementation "androidx.appcompat:appcompat:$rootProject.appCompatVersion"
 
     // Kotlin Android Coroutines
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$rootProject.kotlinxCoroutinesVersion"
@@ -16,6 +17,13 @@ dependencies {
     implementation "com.google.dagger:dagger:$rootProject.daggerVersion"
     kapt "com.google.dagger:dagger-compiler:$rootProject.daggerVersion"
     kaptAndroidTest "com.google.dagger:dagger-compiler:$rootProject.daggerVersion"
+
+    // Picasso
+    implementation "com.squareup.picasso:picasso:$rootProject.picassoVersion"
+
+    // Paging
+    implementation "androidx.paging:paging-runtime-ktx:$rootProject.pagingVersion"
+
 
     // Testing Dependencies
     testImplementation "junit:junit:$rootProject.junitVersion"

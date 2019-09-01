@@ -2,7 +2,9 @@ package com.sheraz.listgithubrepoissues.ui.modules.base
 
 import android.os.Build
 import android.os.Bundle
+import android.view.View
 import android.view.ViewGroup
+import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
 import com.sheraz.listgithubrepoissues.R
@@ -26,9 +28,7 @@ abstract class BaseActivityToolbar<T : ViewDataBinding, VM : BaseViewModel>: Bas
         super.onCreate(savedInstanceState)
 
         val toolbarBinding = DataBindingUtil.setContentView<T>(this, R.layout.app_toolbar)
-        val contentBinding = DataBindingUtil.inflate<T>(layoutInflater, getLayoutResId(), flMainContainer, false)
-
-        flMainContainer.addView(contentBinding.root)
+        val contentBinding = DataBindingUtil.inflate<T>(layoutInflater, getLayoutResId(), flMainContainer, true)
         setViewDataBinding(contentBinding)
     }
 
@@ -55,8 +55,7 @@ abstract class BaseActivityToolbar<T : ViewDataBinding, VM : BaseViewModel>: Bas
 
                 // inset the flMainContainer down by the status bar height
                 val lpFlMainContainer = flMainContainer.layoutParams as ViewGroup.MarginLayoutParams
-                lpFlMainContainer.topMargin += insets.systemWindowInsetTop
-                lpFlMainContainer.leftMargin += insets.systemWindowInsetLeft
+                lpFlMainContainer.bottomMargin += insets.systemWindowInsetBottom
                 lpFlMainContainer.rightMargin += insets.systemWindowInsetRight
                 flMainContainer.layoutParams = lpFlMainContainer
 

@@ -18,7 +18,9 @@ data class GitHubRepoIssueItem(
     val authorLogin: String,
     val createdAt: String,
     val comments: Int,
-    val repositoryUrl: String
+    val repositoryUrl: String,
+    val authorAvatarUrl: String,
+    val authorAssociation: String
 ) : Parcelable {
 
     override fun equals(other: Any?): Boolean {

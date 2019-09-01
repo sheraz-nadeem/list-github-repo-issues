@@ -1,16 +1,24 @@
 package com.sheraz.listgithubrepoissues.ui.modules.home
 
 import android.os.Bundle
+import android.view.Menu
+import android.view.MenuItem
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
+import androidx.paging.PagedList
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
 import com.sheraz.core.data.repository.AppRepository
 import com.sheraz.listgithubrepoissues.BR
 import com.sheraz.listgithubrepoissues.R
 import com.sheraz.listgithubrepoissues.databinding.ActivityHomeBinding
 import com.sheraz.listgithubrepoissues.di.Injector
+import com.sheraz.listgithubrepoissues.ui.models.GitHubRepoIssueItem
+import com.sheraz.listgithubrepoissues.ui.modules.adapters.HomeAdapter
 import com.sheraz.listgithubrepoissues.ui.modules.base.BaseActivityToolbar
 import kotlinx.android.synthetic.main.activity_home.*
+import kotlinx.android.synthetic.main.app_toolbar.*
 
 /**
  * HomeActivity class for our Home view.
@@ -19,16 +27,24 @@ import kotlinx.android.synthetic.main.activity_home.*
 class HomeActivity : BaseActivityToolbar<ActivityHomeBinding, HomeViewModel>() {
 
     private var activityHomeBinding: ActivityHomeBinding? = null
+    private lateinit var pagedItmesList: PagedList<GitHubRepoIssueItem>
     private val homeViewModelFactory: HomeViewModelFactory
     private lateinit var homeViewModel: HomeViewModel
     private val appRepository: AppRepository
+    private val homeAdapter: HomeAdapter
 
     private val ownerName = "tensorflow"
     private val repoName = "ecosystem"
+    private var smoothScrollNeeded = false
+
+    private val pagedListObserver = Observer<PagedList<GitHubRepoIssueItem>> { submitList(it, false) }
+    private val loadingStatusObserver = Observer<Boolean> { handleFetchInProgress(it) }
+    private val networkErrorObserver = Observer<Exception> { handleNetworkError(it) }
 
     init {
 
         logger.d(TAG, "init(): ")
+        homeAdapter = Injector.getAppComponent().homeAdapter()
         appRepository = Injector.getCoreComponent().appRepository()
         homeViewModelFactory = Injector.getAppComponent().homeViewModelFactory()
 
@@ -58,7 +74,8 @@ class HomeActivity : BaseActivityToolbar<ActivityHomeBinding, HomeViewModel>() {
 
         logger.d(TAG, "initUI(): ")
         setUpActionBar()
-        fab.hide()
+        rvGitHubRepoIssuesList.layoutManager = LinearLayoutManager(this)
+        rvGitHubRepoIssuesList.adapter = homeAdapter
 
     }
 
@@ -66,21 +83,31 @@ class HomeActivity : BaseActivityToolbar<ActivityHomeBinding, HomeViewModel>() {
 
         logger.d(TAG, "subscribeUi(): ")
 
-        homeViewModel.getGitHubRepoIssueItemsList().observe(this, Observer { pagedList ->
-            logger.i(TAG, "pagedList.Observer(): pagedList.size: ${pagedList?.size}")
-        })
-
-        homeViewModel.getLoadingLiveData().observe(this, Observer { isFetchInProgress ->
-            logger.d(TAG, "loading.Observer(): isFetchInProgress: $isFetchInProgress")
-            handleFetchInProgress(isFetchInProgress)
-        })
-
-        homeViewModel.getNetworkErrorLiveData().observe(this, Observer { exception ->
-            logger.d(TAG, "networkError.Observer(): exception: $exception")
-            handleNetworkError(exception)
-        })
-
+        homeViewModel.pagedListLiveData?.observe(this, pagedListObserver)
+        homeViewModel.networkFetchStatusLiveData.observe(this, loadingStatusObserver)
+        homeViewModel.networkErrorStatusLiveData.observe(this, networkErrorObserver)
         homeViewModel.loadData(ownerName, repoName)
+
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        menuInflater.inflate(R.menu.options_menu, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        when (item?.itemId) {
+            R.id.clearLocalDbCache -> handleClearCache()
+        }
+        return super.onOptionsItemSelected(item)
+    }
+
+    private fun submitList(pagedList: PagedList<GitHubRepoIssueItem>?, isRefreshing: Boolean) {
+
+        logger.d(TAG, "submitList(): pagedList: ${pagedList?.size}, isRefreshing: $isRefreshing")
+        homeAdapter.submitList(pagedList)
+        swipeRefreshLayout.isRefreshing = isRefreshing
+        pagedItmesList = pagedList!!
 
     }
 
@@ -103,7 +130,18 @@ class HomeActivity : BaseActivityToolbar<ActivityHomeBinding, HomeViewModel>() {
     private fun setUpListeners() {
 
         logger.d(TAG, "setUpListeners(): ")
-        swipeRefreshLayout.setOnRefreshListener { homeViewModel.onRefresh() }
+        swipeRefreshLayout.setOnRefreshListener { homeViewModel.onRefresh(ownerName, repoName) }
+
+    }
+
+    private fun handleClearCache() {
+
+        logger.d(TAG, "handleClearCache(): ")
+        homeViewModel.pagedListLiveData?.removeObservers(this)
+        homeViewModel.onClearCache()
+        homeAdapter.currentList?.dataSource?.invalidate()
+        homeViewModel.buildLivePagedList()
+        homeViewModel.pagedListLiveData?.observe(this, pagedListObserver)
 
     }
 
