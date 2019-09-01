@@ -19,7 +19,7 @@ class HomeViewModel(
 ): BaseViewModel() {
 
     private val pagedListConfig: PagedList.Config
-    private val _allReposPagedFactory = appRepository.getAllReposPagedFactory().map { it.toUiModel() }
+    private val _allReposPagedFactory = appRepository.getAllRepoIssuesPagedFactory().map { it.toUiModel() }
 
     val networkFetchStatusLiveData = appRepository.isFetchInProgress
     val networkErrorStatusLiveData = appRepository.networkError

@@ -21,7 +21,7 @@ interface AppRepository {
     val networkError: LiveData<Exception>
     val noMoreItemsAvailable: LiveData<Boolean>
 
-    fun getAllReposPagedFactory(): DataSource.Factory<Int, GitHubRepoIssueEntity>
+    fun getAllRepoIssuesPagedFactory(): DataSource.Factory<Int, GitHubRepoIssueEntity>
     fun getAllRepoIssuesLiveData(): LiveData<List<GitHubRepoIssueEntity>>
     fun getOpenIssuesLiveData(): LiveData<List<GitHubRepoIssueEntity>>
     fun getClosedIssuesLiveData(): LiveData<List<GitHubRepoIssueEntity>>

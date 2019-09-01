@@ -40,7 +40,7 @@ class AppRepositoryImpl(
         logger.d(TAG, "init(): ")
     }
 
-    override fun getAllReposPagedFactory() = gitHubRepoIssueEntityDao.getAllRepoIssuesPaged()
+    override fun getAllRepoIssuesPagedFactory() = gitHubRepoIssueEntityDao.getAllRepoIssuesPaged()
 
     /**
      * Method to return all issues live data
