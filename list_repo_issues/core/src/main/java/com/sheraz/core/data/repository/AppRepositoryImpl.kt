@@ -118,7 +118,7 @@ class AppRepositoryImpl(
 
     /**
      * Method that sends request using [GitHubNetworkDataSource] and returns
-     * [GetGitHubRepoIssuesResponse] response wrapped inside [Result]
+     * [List<GitHubRepoIssueEntity>] response wrapped inside [Result]
      */
     private suspend fun fetchRepoIssuesFromNetworkAndPersist(ownerName: String = "",
                                                              repoName: String = "",
