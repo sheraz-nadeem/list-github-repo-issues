@@ -14,6 +14,7 @@ import com.sheraz.listgithubrepoissues.BR
 import com.sheraz.listgithubrepoissues.R
 import com.sheraz.listgithubrepoissues.databinding.ActivityHomeBinding
 import com.sheraz.listgithubrepoissues.di.Injector
+import com.sheraz.listgithubrepoissues.extensions.bindViewModel
 import com.sheraz.listgithubrepoissues.ui.models.GitHubRepoIssueItem
 import com.sheraz.listgithubrepoissues.ui.modules.adapters.HomeAdapter
 import com.sheraz.listgithubrepoissues.ui.modules.base.BaseActivityToolbar
@@ -27,15 +28,12 @@ import kotlinx.android.synthetic.main.app_toolbar.*
 class HomeActivity : BaseActivityToolbar<ActivityHomeBinding, HomeViewModel>() {
 
     private var activityHomeBinding: ActivityHomeBinding? = null
-    private lateinit var pagedItmesList: PagedList<GitHubRepoIssueItem>
     private val homeViewModelFactory: HomeViewModelFactory
-    private lateinit var homeViewModel: HomeViewModel
     private val appRepository: AppRepository
     private val homeAdapter: HomeAdapter
 
     private val ownerName = "tensorflow"
     private val repoName = "ecosystem"
-    private var smoothScrollNeeded = false
 
     private val pagedListObserver = Observer<PagedList<GitHubRepoIssueItem>> { submitList(it, false) }
     private val loadingStatusObserver = Observer<Boolean> { handleFetchInProgress(it) }
@@ -50,11 +48,12 @@ class HomeActivity : BaseActivityToolbar<ActivityHomeBinding, HomeViewModel>() {
 
     }
 
+    private val homeViewModel by bindViewModel<HomeViewModel>(homeViewModelFactory)
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         logger.d(TAG, "onCreate(): ")
         super.onCreate(savedInstanceState)
-
-        homeViewModel = ViewModelProviders.of(this, homeViewModelFactory).get(HomeViewModel::class.java)
 
         performDataBinding()
         activityHomeBinding = getViewDataBinding()
@@ -107,7 +106,6 @@ class HomeActivity : BaseActivityToolbar<ActivityHomeBinding, HomeViewModel>() {
         logger.d(TAG, "submitList(): pagedList: ${pagedList?.size}, isRefreshing: $isRefreshing")
         homeAdapter.submitList(pagedList)
         swipeRefreshLayout.isRefreshing = isRefreshing
-        pagedItmesList = pagedList!!
 
     }
 

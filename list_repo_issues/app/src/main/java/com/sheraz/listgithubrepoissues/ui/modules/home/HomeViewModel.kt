@@ -1,12 +1,8 @@
 package com.sheraz.listgithubrepoissues.ui.modules.home
 
-import android.graphics.pdf.PdfRenderer
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Transformations
 import androidx.paging.LivePagedListBuilder
 import androidx.paging.PagedList
-import com.sheraz.core.data.db.entity.GitHubRepoIssueEntity
 import com.sheraz.core.data.repository.AppRepository
 import com.sheraz.listgithubrepoissues.extensions.toUiModel
 import com.sheraz.listgithubrepoissues.ui.models.GitHubRepoIssueItem

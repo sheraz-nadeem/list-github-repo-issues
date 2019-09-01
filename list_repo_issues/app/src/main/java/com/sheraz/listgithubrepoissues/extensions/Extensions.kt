@@ -1,5 +1,9 @@
 package com.sheraz.listgithubrepoissues.extensions
 
+import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewModelProviders
 import com.sheraz.core.data.db.entity.GitHubRepoIssueEntity
 import com.sheraz.listgithubrepoissues.ui.models.GitHubRepoIssueItem
 
@@ -23,3 +27,11 @@ fun GitHubRepoIssueEntity.toUiModel(): GitHubRepoIssueItem {
         authorAssociation = authorAssociation
     )
 }
+
+/**
+ * An Extension function for AppCompatActivity to lazily initialize
+ * ViewModel instance by providing [ViewModelProvider.Factory] instance
+ */
+
+inline fun <reified V : ViewModel> AppCompatActivity.bindViewModel(viewModelFactory: ViewModelProvider.Factory) =
+    lazy { ViewModelProviders.of(this, viewModelFactory).get(V::class.java) }
