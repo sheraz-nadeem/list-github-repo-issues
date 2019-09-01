@@ -50,14 +50,17 @@ class GitHubNetworkDataSourceImpl(
      *
      * @return List<GitHubRepoIssueEntity> list of entity objects
      */
-    private suspend fun fetchRepoIssuesFromNetwork(ownerName: String, repoName: String, pageSize: Int, page: Int): Result<List<GitHubRepoIssueEntity>> {
+    private suspend fun fetchRepoIssuesFromNetwork(ownerName: String,
+                                                   repoName: String,
+                                                   pageSize: Int,
+                                                   page: Int): Result<List<GitHubRepoIssueEntity>> {
 
         logger.d(TAG, "fetchRepoIssuesFromNetwork(): ownerName: $ownerName, repoName: $repoName, pageSize: $pageSize, page: $page")
 
         val response = gitHubApiService.getRepoIssuesAsync(ownerName, repoName, pageSize, page).await()
 
         if (response?.isSuccessful) {
-
+            logger.i(TAG, "fetchRepoIssuesFromNetwork(): response is successful")
             val responseBody = response.body()
             if (responseBody != null) {
                 return Result.Success(responseBody)
