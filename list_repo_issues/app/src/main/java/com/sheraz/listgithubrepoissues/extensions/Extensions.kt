@@ -1,6 +1,7 @@
 package com.sheraz.listgithubrepoissues.extensions
 
 import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
@@ -35,3 +36,9 @@ fun GitHubRepoIssueEntity.toUiModel(): GitHubRepoIssueItem {
 
 inline fun <reified V : ViewModel> AppCompatActivity.bindViewModel(viewModelFactory: ViewModelProvider.Factory) =
     lazy { ViewModelProviders.of(this, viewModelFactory).get(V::class.java) }
+
+/**
+ * An Extension function for AppCompatActivity to find a fragment by tag
+ */
+
+inline fun <reified T : Fragment> AppCompatActivity.findFragmentByTag(tag: String) : T? = supportFragmentManager.findFragmentByTag(tag) as? T
