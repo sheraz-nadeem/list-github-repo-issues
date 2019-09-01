@@ -1,6 +1,7 @@
 package com.sheraz.listgithubrepoissues.ui.modules.home
 
 import android.app.Dialog
+import android.os.Build
 import android.os.Bundle
 import android.os.Parcelable
 import android.view.LayoutInflater
@@ -14,6 +15,7 @@ import com.sheraz.listgithubrepoissues.databinding.FragmentGoToDetailBottomSheet
 import com.sheraz.listgithubrepoissues.di.Injector
 import com.sheraz.listgithubrepoissues.ui.models.GitHubRepoIssueItem
 import com.sheraz.listgithubrepoissues.utils.getFormattedDate
+import com.sheraz.listgithubrepoissues.utils.setWhiteNavigationBar
 import kotlinx.android.synthetic.main.fragment_go_to_detail_bottom_sheet.*
 
 
@@ -40,7 +42,13 @@ class GoToDetailBottomSheetDialogFragment : BottomSheetDialogFragment() {
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         logger.d(TAG, "onCreateDialog: ")
-        return super.onCreateDialog(savedInstanceState)
+        val dialog =  super.onCreateDialog(savedInstanceState)
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
+            setWhiteNavigationBar(dialog)
+        }
+
+        return dialog
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
