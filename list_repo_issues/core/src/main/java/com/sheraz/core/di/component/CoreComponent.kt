@@ -4,6 +4,7 @@ import android.content.Context
 import com.sheraz.core.data.db.GitHubRepoDatabase
 import com.sheraz.core.data.db.dao.GitHubRepoIssueEntityDao
 import com.sheraz.core.data.repository.AppRepository
+import com.sheraz.core.data.sharedprefs.AppSharedPrefs
 import com.sheraz.core.di.module.*
 import com.sheraz.core.network.GitHubApiService
 import com.sheraz.core.network.GitHubNetworkDataSource
@@ -38,5 +39,6 @@ interface CoreComponent {
     fun gitHubNetworkDataSource(): GitHubNetworkDataSource
     fun picasso(): Picasso
     fun appRepository(): AppRepository
+    fun sharedPrefs(): AppSharedPrefs
     fun logger(): Logger
 }
