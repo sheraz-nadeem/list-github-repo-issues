@@ -59,7 +59,7 @@ class HomeViewModel(
 
     fun buildLivePagedList() {
         pagedListLiveData = LivePagedListBuilder(_allReposPagedFactory, pagedListConfig)
-            .setBoundaryCallback(RepoBoundaryCallback())
+            .setBoundaryCallback(RepoIssuesBoundaryCallback())
             .build()
     }
 
@@ -70,7 +70,7 @@ class HomeViewModel(
 
     }
 
-    inner class RepoBoundaryCallback : PagedList.BoundaryCallback<GitHubRepoIssueItem>() {
+    inner class RepoIssuesBoundaryCallback : PagedList.BoundaryCallback<GitHubRepoIssueItem>() {
 
         /**
          * Database returned 0 items. We should query the backend for more items.
@@ -99,7 +99,7 @@ class HomeViewModel(
 
     companion object {
         private val TAG = HomeViewModel::class.java.simpleName
-        private val TAG_REPO_BOUNDARY_CALLBACK: String = RepoBoundaryCallback::class.java.simpleName
+        private val TAG_REPO_BOUNDARY_CALLBACK: String = RepoIssuesBoundaryCallback::class.java.simpleName
 
         const val DATABASE_PAGE_SIZE = 20
         const val PREFETCH_DISTANCE = 5
