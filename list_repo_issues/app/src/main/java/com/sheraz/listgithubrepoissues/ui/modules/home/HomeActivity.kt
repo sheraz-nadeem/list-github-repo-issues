@@ -126,7 +126,7 @@ class HomeActivity : BaseActivityToolbar<ActivityHomeBinding, HomeViewModel>() {
 
     private fun handleNetworkError(exception: Exception) {
 
-        logger.d(TAG, "handleNetworkError(): exception: $exception")
+        logger.e(TAG, "handleNetworkError(): exception: $exception")
         swipeRefreshLayout.isRefreshing = false
         Snackbar.make(activityHomeBinding?.root!!, exception.message.toString(), Snackbar.LENGTH_LONG).show()
 
