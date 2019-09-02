@@ -20,16 +20,13 @@ class SearchRepoViewModel(
     private val appRepository: AppRepository
 ): BaseViewModel() {
 
-//    private val pagedListConfig: PagedList.Config
-    private val _allReposLiveData = appRepository.getAllReposLiveData()
-    val allReposLiveData: LiveData<List<GitHubRepoItem>> = Transformations.map(_allReposLiveData) {entityList ->
-        entityList.map { it.toUiModel() }
-    }
+    private val pagedListConfig: PagedList.Config
+    private val _allReposPagedFactory = appRepository.getAllReposPagedFactory().map { it.toUiModel() }
 
     val networkFetchStatusLiveData = appRepository.isFetchInProgress
     val networkErrorStatusLiveData = appRepository.networkError
 
-//    var pagedListLiveData: LiveData<PagedList<GitHubRepoItem>>? = null
+    var pagedListLiveData: LiveData<PagedList<GitHubRepoItem>>? = null
     var lastSearchQuery = ""
 
     init {
@@ -38,15 +35,15 @@ class SearchRepoViewModel(
         setIsLoading(false)
 
         // Kahaf
-//        pagedListConfig =
-//            PagedList.Config.Builder()
-//                .setPrefetchDistance(PREFETCH_DISTANCE)
-//                .setPageSize(DATABASE_PAGE_SIZE)
-//                .setInitialLoadSizeHint(DATABASE_PAGE_SIZE)
-//                .setEnablePlaceholders(false)
-//                .build()
+        pagedListConfig =
+            PagedList.Config.Builder()
+                .setPrefetchDistance(PREFETCH_DISTANCE)
+                .setPageSize(DATABASE_PAGE_SIZE)
+                .setInitialLoadSizeHint(DATABASE_PAGE_SIZE)
+                .setEnablePlaceholders(false)
+                .build()
 
-//        buildLivePagedList()
+        buildLivePagedList()
     }
 
     fun search(query: String, pageSize: Int = AppRepository.NETWORK_PAGE_SIZE, page: Int = 1) =
@@ -64,11 +61,11 @@ class SearchRepoViewModel(
         appRepository.clearReposCache()
     }
 
-//    fun buildLivePagedList() {
-//        pagedListLiveData = LivePagedListBuilder(_allReposPagedFactory, pagedListConfig)
-//            .setBoundaryCallback(RepoBoundaryCallback())
-//            .build()
-//    }
+    fun buildLivePagedList() {
+        pagedListLiveData = LivePagedListBuilder(_allReposPagedFactory, pagedListConfig)
+            .setBoundaryCallback(RepoBoundaryCallback())
+            .build()
+    }
 
     override fun onCleared() {
 

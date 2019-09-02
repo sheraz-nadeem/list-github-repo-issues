@@ -1,7 +1,6 @@
 package com.sheraz.listgithubrepoissues.ui.modules.home
 
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.Transformations
 import androidx.paging.LivePagedListBuilder
 import androidx.paging.PagedList
 import com.sheraz.core.data.repository.AppRepository
@@ -21,15 +20,13 @@ class HomeViewModel(
     private val appSharedPrefs: AppSharedPrefs
 ): BaseViewModel() {
 
-//    private val pagedListConfig: PagedList.Config
-    private val _allRepoIssuesLiveData = appRepository.getAllRepoIssuesLiveData()
-    val allRepoIssuesLiveData: LiveData<List<GitHubRepoIssueItem>> = Transformations.map(_allRepoIssuesLiveData) { entityList ->
-        entityList.map { it.toUiModel() }}
+    private val pagedListConfig: PagedList.Config
+    private val _allRepoIssuesPagedFactory = appRepository.getAllRepoIssuesPagedFactory().map { it.toUiModel() }
 
     val networkFetchStatusLiveData = appRepository.isFetchInProgress
     val networkErrorStatusLiveData = appRepository.networkError
 
-//    var pagedListLiveData: LiveData<PagedList<GitHubRepoIssueItem>>? = null
+    var pagedListLiveData: LiveData<PagedList<GitHubRepoIssueItem>>? = null
 
     init {
 
@@ -37,15 +34,15 @@ class HomeViewModel(
         setIsLoading(false)
 
         // Kahaf
-//        pagedListConfig =
-//            PagedList.Config.Builder()
-//                .setPrefetchDistance(PREFETCH_DISTANCE)
-//                .setPageSize(DATABASE_PAGE_SIZE)
-//                .setInitialLoadSizeHint(DATABASE_PAGE_SIZE)
-//                .setEnablePlaceholders(false)
-//                .build()
+        pagedListConfig =
+            PagedList.Config.Builder()
+                .setPrefetchDistance(PREFETCH_DISTANCE)
+                .setPageSize(DATABASE_PAGE_SIZE)
+                .setInitialLoadSizeHint(DATABASE_PAGE_SIZE)
+                .setEnablePlaceholders(false)
+                .build()
 
-//        buildLivePagedList()
+        buildLivePagedList()
     }
 
     fun loadData(ownerName: String, repoName: String, pageSize: Int = AppRepository.NETWORK_PAGE_SIZE, page: Int = 1) =
@@ -62,11 +59,11 @@ class HomeViewModel(
         appRepository.clearRepoIssuesCache()
     }
 
-//    fun buildLivePagedList() {
-//        pagedListLiveData = LivePagedListBuilder(_allReposPagedFactory, pagedListConfig)
-//            .setBoundaryCallback(RepoIssuesBoundaryCallback())
-//            .build()
-//    }
+    fun buildLivePagedList() {
+        pagedListLiveData = LivePagedListBuilder(_allRepoIssuesPagedFactory, pagedListConfig)
+            .setBoundaryCallback(RepoIssuesBoundaryCallback())
+            .build()
+    }
 
     override fun onCleared() {
 

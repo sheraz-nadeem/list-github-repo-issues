@@ -37,7 +37,7 @@ class SearchRepositoryBottomSheetDialogFragment: BottomSheetDialogFragment(), Di
     private val searchRepositoryAdapter: SearchRepositoryAdapter
     private val searchRepoViewModelFactory: SearchRepoViewModelFactory
 
-    private val pagedListObserver = Observer<List<GitHubRepoItem>> { submitList(it, false) }
+    private val pagedListObserver = Observer<PagedList<GitHubRepoItem>> { submitList(it, false) }
     private val loadingStatusObserver = Observer<Boolean> { handleFetchInProgress(it) }
     private val networkErrorObserver = Observer<Exception> { handleNetworkError(it) }
 
@@ -173,7 +173,7 @@ class SearchRepositoryBottomSheetDialogFragment: BottomSheetDialogFragment(), Di
 
         logger.d(TAG, "subscribeUi(): ")
 
-        searchRepoViewModel.allReposLiveData.observe(this, pagedListObserver)
+        searchRepoViewModel.pagedListLiveData?.observe(this, pagedListObserver)
         searchRepoViewModel.networkFetchStatusLiveData.observe(this, loadingStatusObserver)
         searchRepoViewModel.networkErrorStatusLiveData.observe(this, networkErrorObserver)
 
@@ -185,13 +185,10 @@ class SearchRepositoryBottomSheetDialogFragment: BottomSheetDialogFragment(), Di
 
     }
 
-    private fun submitList(list: List<GitHubRepoItem>, isRefreshing: Boolean) {
-        logger.d(TAG, "submitList(): list: ${list.size}, isRefreshing: $isRefreshing")
-        if (searchRepositoryAdapter.itemCount > 0) {
-            searchRepositoryAdapter.updatedItems(list)
-        } else {
-            searchRepositoryAdapter.addItems(list)
-        }
+    private fun submitList(pagedList: PagedList<GitHubRepoItem>?, isRefreshing: Boolean) {
+
+        logger.d(TAG, "submitList(): pagedList: ${pagedList?.size}, isRefreshing: $isRefreshing")
+        searchRepositoryAdapter.submitList(pagedList)
     }
 
     private fun handleFetchInProgress(isFetchInProgress: Boolean) {
@@ -207,11 +204,11 @@ class SearchRepositoryBottomSheetDialogFragment: BottomSheetDialogFragment(), Di
     private fun handleClearCache() {
 
         logger.d(TAG, "handleClearCache(): ")
-//        searchRepoViewModel.allReposLiveData.removeObservers(this)
-        searchRepositoryAdapter.clearItems()
+        searchRepoViewModel.pagedListLiveData?.removeObservers(this)
         searchRepoViewModel.onClearCache()
-//        searchRepoViewModel.buildLivePagedList()
-//        searchRepoViewModel.allReposLiveData.observe(this, pagedListObserver)
+        searchRepositoryAdapter.currentList?.dataSource?.invalidate()
+        searchRepoViewModel.buildLivePagedList()
+        searchRepoViewModel.pagedListLiveData?.observe(this, pagedListObserver)
 
     }
 

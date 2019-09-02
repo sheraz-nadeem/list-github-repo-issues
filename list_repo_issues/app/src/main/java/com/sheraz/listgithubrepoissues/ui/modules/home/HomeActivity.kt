@@ -40,7 +40,7 @@ class HomeActivity : BaseActivityToolbar<ActivityHomeBinding, HomeViewModel>(), 
     private val appRepository: AppRepository
     private val homeAdapter: HomeAdapter
 
-    private val pagedListObserver = Observer<List<GitHubRepoIssueItem>> { submitList(it, false) }
+    private val pagedListObserver = Observer<PagedList<GitHubRepoIssueItem>> { submitList(it, false) }
     private val loadingStatusObserver = Observer<Boolean> { handleFetchInProgress(it) }
     private val networkErrorObserver = Observer<Exception> { handleNetworkError(it) }
 
@@ -99,7 +99,7 @@ class HomeActivity : BaseActivityToolbar<ActivityHomeBinding, HomeViewModel>(), 
 
         logger.d(TAG, "subscribeUi(): ")
 
-        homeViewModel.allRepoIssuesLiveData.observe(this, pagedListObserver)
+        homeViewModel.pagedListLiveData?.observe(this, pagedListObserver)
         homeViewModel.networkFetchStatusLiveData.observe(this, loadingStatusObserver)
         homeViewModel.networkErrorStatusLiveData.observe(this, networkErrorObserver)
         loadData()
@@ -129,18 +129,13 @@ class HomeActivity : BaseActivityToolbar<ActivityHomeBinding, HomeViewModel>(), 
 
     }
 
-    private fun submitList(list: List<GitHubRepoIssueItem>, isRefreshing: Boolean) {
+    private fun submitList(pagedList: PagedList<GitHubRepoIssueItem>?, isRefreshing: Boolean) {
 
-        logger.d(TAG, "submitList(): list: ${list.size}, isRefreshing: $isRefreshing")
-        if (homeAdapter.itemCount > 0) {
-            homeAdapter.updatedItems(list)
-        } else {
-            homeAdapter.addItems(list)
-        }
-
+        logger.d(TAG, "submitList(): pagedList: ${pagedList?.size}, isRefreshing: $isRefreshing")
+        homeAdapter.submitList(pagedList)
         swipeRefreshLayout.isRefreshing = isRefreshing
 
-        val pagedListSize: Int = list.size
+        val pagedListSize: Int = pagedList?.size ?: 0
         if (pagedListSize > 0) {
             llNoData.visibility = View.GONE
         }
@@ -163,7 +158,7 @@ class HomeActivity : BaseActivityToolbar<ActivityHomeBinding, HomeViewModel>(), 
         swipeRefreshLayout.isRefreshing = false
         Snackbar.make(activityHomeBinding?.root!!, exception.message.toString(), Snackbar.LENGTH_LONG).show()
 
-        if (homeAdapter.itemCount == 0) {
+        if (homeAdapter.currentList?.isEmpty()!!) {
             llNoData.visibility = View.VISIBLE
         }
 
@@ -184,11 +179,11 @@ class HomeActivity : BaseActivityToolbar<ActivityHomeBinding, HomeViewModel>(), 
     private fun handleClearCache() {
 
         logger.d(TAG, "handleClearCache(): ")
-//        homeViewModel.allRepoIssuesLiveData.removeObservers(this)
-        homeAdapter.clearItems()
+        homeViewModel.pagedListLiveData?.removeObservers(this)
         homeViewModel.onClearCache()
-//        homeViewModel.buildLivePagedList()
-//        homeViewModel.allRepoIssuesLiveData.observe(this, pagedListObserver)
+        homeAdapter.currentList?.dataSource?.invalidate()
+        homeViewModel.buildLivePagedList()
+        homeViewModel.pagedListLiveData?.observe(this, pagedListObserver)
 
     }
 

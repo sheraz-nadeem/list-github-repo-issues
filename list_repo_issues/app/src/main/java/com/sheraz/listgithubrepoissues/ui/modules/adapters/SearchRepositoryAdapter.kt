@@ -21,10 +21,9 @@ import kotlinx.android.synthetic.main.item_search_repo.view.*
 class SearchRepositoryAdapter(
     private val logger: Logger,
     private val mPicasso: Picasso
-) : RecyclerView.Adapter<SearchRepositoryAdapter.ViewHolder>() {
+) : PagedListAdapter<GitHubRepoItem, SearchRepositoryAdapter.ViewHolder>(GitHubRepoDiffCallback()) {
 
 
-    private var mItems: MutableList<GitHubRepoItem> = mutableListOf()
     private var mListener: View.OnClickListener? = null
 
     init { logger.d(TAG, "init(): ") }
@@ -36,30 +35,8 @@ class SearchRepositoryAdapter(
     }
 
     override fun onBindViewHolder(viewHolder: ViewHolder, position: Int) {
-        logger.d(TAG, "onBindViewHolder: position: $position, mItems.size: ${mItems.size}")
-        viewHolder.bind(mItems[position])
-    }
-
-    override fun getItemCount(): Int = mItems.size
-
-    fun addItems(items: List<GitHubRepoItem>) {
-        mItems.addAll(items)
-        logger.d(TAG, "addItems(): newItems.size: ${items.size}, mItems.size: ${mItems.size}")
-
-        notifyDataSetChanged()
-    }
-
-    fun updatedItems(items: List<GitHubRepoItem>) {
-        val diffResult = DiffUtil.calculateDiff(GitHubRepoDiffCallback(items, mItems))
-        diffResult.dispatchUpdatesTo(this)
-        logger.d(TAG, "updatedItems(): newItems.size: ${items.size}, mItems.size: ${mItems.size}")
-    }
-
-    fun clearItems() {
-        logger.d(TAG, "clearItems(): ")
-        mItems.clear()
-        mItems = mutableListOf()
-        notifyDataSetChanged()
+        logger.d(TAG, "onBindViewHolder: position: $position, currentList.size: ${currentList?.size}")
+        viewHolder.bind(getItem(position))
     }
 
     fun setListener(listener: View.OnClickListener) {
@@ -69,26 +46,29 @@ class SearchRepositoryAdapter(
 
     inner class ViewHolder(v: View) : RecyclerView.ViewHolder(v) {
 
-        fun bind(gitHubRepoItem: GitHubRepoItem) {
+        fun bind(gitHubRepoItem: GitHubRepoItem?) {
+
+            if (gitHubRepoItem == null) return
+
             setUpViews(gitHubRepoItem)
             handleClicks()
         }
 
-        private fun setUpViews(gitHubRepoItem: GitHubRepoItem) {
+        private fun setUpViews(gitHubRepoItem: GitHubRepoItem?) {
 
-            logger.d(TAG, "setUpViews: position: $adapterPosition, repoFullName: ${gitHubRepoItem.fullName}, description: ${gitHubRepoItem.description}")
+            logger.d(TAG, "setUpViews: position: $adapterPosition, repoFullName: ${gitHubRepoItem?.fullName}, description: ${gitHubRepoItem?.description}")
 
-            mPicasso.load(gitHubRepoItem.ownerAvatarUrl)
+            mPicasso.load(gitHubRepoItem?.ownerAvatarUrl)
                 .noFade()
                 .placeholder(R.drawable.octocat)
                 .into(itemView.ivOwnerAvatar)
 
-            itemView.tvRepoName.text = gitHubRepoItem.name
-            itemView.tvOwnerLogin.text = gitHubRepoItem.ownerLogin
-            itemView.tvRepoFullName.text = gitHubRepoItem.fullName
-            itemView.tvRepoDescription.text = gitHubRepoItem.description
+            itemView.tvRepoName.text = gitHubRepoItem?.name
+            itemView.tvOwnerLogin.text = gitHubRepoItem?.ownerLogin
+            itemView.tvRepoFullName.text = gitHubRepoItem?.fullName
+            itemView.tvRepoDescription.text = gitHubRepoItem?.description
 
-            when (gitHubRepoItem.fork) {
+            when (gitHubRepoItem?.fork) {
                 true -> {
                     itemView.tvForked.text = "FORKED"
                     itemView.llRootContainer.setBackgroundColor(ContextCompat.getColor(itemView.context, android.R.color.white))
@@ -105,9 +85,9 @@ class SearchRepositoryAdapter(
 
             itemView.setOnClickListener {
 
-                val repoItem = mItems[adapterPosition]
+                val repoItem = getItem(adapterPosition)
                 it.tag = repoItem
-                logger.d(TAG, "OnClickListener: position: $adapterPosition, title: ${repoItem.fullName}, description: ${repoItem.description}")
+                logger.d(TAG, "OnClickListener: position: $adapterPosition, title: ${repoItem?.fullName}, description: ${repoItem?.description}")
                 mListener?.onClick(it)
 
             }
