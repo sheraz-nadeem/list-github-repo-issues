@@ -33,7 +33,7 @@ class HomeActivity : BaseActivityToolbar<ActivityHomeBinding, HomeViewModel>(), 
 
     private var ownerName = ""
     private var repoName = ""
-    private var isRefreshing = false
+    private var isActivityRecreated = false
 
     private val appSharedPrefs: AppSharedPrefs
     private val homeViewModelFactory: HomeViewModelFactory
@@ -61,6 +61,7 @@ class HomeActivity : BaseActivityToolbar<ActivityHomeBinding, HomeViewModel>(), 
         logger.d(TAG, "onCreate(): ")
         super.onCreate(savedInstanceState)
 
+        isActivityRecreated = savedInstanceState != null
         performDataBinding()
         activityHomeBinding = getViewDataBinding()
 
@@ -102,7 +103,7 @@ class HomeActivity : BaseActivityToolbar<ActivityHomeBinding, HomeViewModel>(), 
         homeViewModel.pagedListLiveData?.observe(this, pagedListObserver)
         homeViewModel.networkFetchStatusLiveData.observe(this, loadingStatusObserver)
         homeViewModel.networkErrorStatusLiveData.observe(this, networkErrorObserver)
-        loadData()
+        if (!isActivityRecreated) loadData()
 
     }
 
