@@ -4,14 +4,16 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import com.sheraz.core.data.db.dao.GitHubRepoEntityDao
 import com.sheraz.core.data.db.dao.GitHubRepoIssueEntityDao
+import com.sheraz.core.data.db.entity.GitHubRepoEntity
 import com.sheraz.core.data.db.entity.GitHubRepoIssueEntity
 
 /**
  * Our Room Database class with [GitHubRepoIssueEntity]
  */
 @Database(
-    entities = [GitHubRepoIssueEntity::class],
+    entities = [GitHubRepoIssueEntity::class, GitHubRepoEntity::class],
     version = 1,
     exportSchema = false // Just to get rid of the warning generated at build time
 )
@@ -24,6 +26,7 @@ abstract class GitHubRepoDatabase : RoomDatabase() {
      **********/
 
     abstract fun gitHubRepoIssueEntityDao(): GitHubRepoIssueEntityDao
+    abstract fun gitHubRepoEntityDao(): GitHubRepoEntityDao
 
     companion object {
         @Volatile

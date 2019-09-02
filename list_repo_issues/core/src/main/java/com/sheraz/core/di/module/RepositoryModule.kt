@@ -1,5 +1,6 @@
 package com.sheraz.core.di.module
 
+import com.sheraz.core.data.db.dao.GitHubRepoEntityDao
 import com.sheraz.core.data.db.dao.GitHubRepoIssueEntityDao
 import com.sheraz.core.data.repository.AppRepository
 import com.sheraz.core.data.repository.AppRepositoryImpl
@@ -22,8 +23,9 @@ class RepositoryModule {
     @Singleton
     fun provideAppRepository(
         logger: Logger,
-        dao: GitHubRepoIssueEntityDao,
+        gitHubRepoIssueEntityDao: GitHubRepoIssueEntityDao,
+        gitHubRepoEntityDao: GitHubRepoEntityDao,
         networkDataSource: GitHubNetworkDataSource
-    ): AppRepository = AppRepositoryImpl.invoke(logger, dao, networkDataSource)
+    ): AppRepository = AppRepositoryImpl.invoke(logger, gitHubRepoIssueEntityDao, gitHubRepoEntityDao, networkDataSource)
 
 }

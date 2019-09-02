@@ -2,6 +2,7 @@ package com.sheraz.core.network
 
 import com.sheraz.core.data.db.entity.GitHubRepoEntity
 import com.sheraz.core.data.db.entity.GitHubRepoIssueEntity
+import com.sheraz.core.network.response.SearchGitHubRepoResponse
 import kotlinx.coroutines.Deferred
 import retrofit2.Response
 import retrofit2.Retrofit
@@ -47,7 +48,7 @@ interface GitHubApiService {
         @Query("q") query: String,
         @Query("per_page") pageSize: Int,
         @Query("page") page: Int
-    ): Deferred<Response<List<GitHubRepoEntity>>>
+    ): Deferred<Response<SearchGitHubRepoResponse>>
 
 
     companion object {

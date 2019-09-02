@@ -1,19 +1,17 @@
-package com.sheraz.listgithubrepoissues.ui.modules.home
+package com.sheraz.listgithubrepoissues.ui.modules.home.searchrepo
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.sheraz.core.data.repository.AppRepository
-import com.sheraz.core.data.sharedprefs.AppSharedPrefs
 import com.sheraz.core.utils.Logger
 
 /**
- * Factory for creating [HomeViewModel].
+ * Factory for creating [SearchRepoViewModel].
  */
 
-class HomeViewModelFactory(
+class SearchRepoViewModelFactory(
     private val logger: Logger,
-    private val appRepository: AppRepository,
-    private val appSharedPrefs: AppSharedPrefs
+    private val appRepository: AppRepository
 ): ViewModelProvider.Factory {
 
     init {
@@ -25,14 +23,14 @@ class HomeViewModelFactory(
 
         logger.d(TAG, "create(): ")
 
-        if (modelClass != HomeViewModel::class.java) {
+        if (modelClass != SearchRepoViewModel::class.java) {
             throw IllegalArgumentException("Unknown ViewModel class")
         }
-        return HomeViewModel(appRepository, appSharedPrefs) as T
+        return SearchRepoViewModel(appRepository) as T
 
     }
 
     companion object {
-        private val TAG = HomeViewModelFactory::class.java.simpleName
+        private val TAG = SearchRepoViewModelFactory::class.java.simpleName
     }
 }

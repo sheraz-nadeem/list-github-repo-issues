@@ -51,5 +51,10 @@ class AppSharedPrefs @Inject constructor(private val sharedPreferences: SharedPr
                 }
             }
         }
+
+        const val SELECTED_GITHUB_REPO_OWNER_KEY = "selected_github_repo_owner"
+        const val SELECTED_GITHUB_REPO_NAME_KEY = "selected_github_repo_name"
+        const val DEFAULT_GITHUB_REPO_OWNER = "tensorflow"
+        const val DEFAULT_GITHUB_REPO_NAME = "ecosystem"
     }
 }

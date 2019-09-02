@@ -3,9 +3,15 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
-        android:id="@+id/clearLocalDbCache"
+        android:id="@+id/clearLocalDbCacheMenuItem"
         android:icon="@drawable/ic_database_refresh"
         android:title="@string/clear_local_db_cache_menu_text"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/searchRepoMenuItem"
+        android:icon="@drawable/ic_database_refresh"
+        android:title="@string/search_repo_text"
         app:showAsAction="never" />
 
 </menu>

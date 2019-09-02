@@ -2,6 +2,7 @@ package com.sheraz.core.data.repository
 
 import androidx.lifecycle.LiveData
 import androidx.paging.DataSource
+import com.sheraz.core.data.db.entity.GitHubRepoEntity
 import com.sheraz.core.data.db.entity.GitHubRepoIssueEntity
 
 /**
@@ -22,12 +23,17 @@ interface AppRepository {
     val noMoreItemsAvailable: LiveData<Boolean>
 
     fun getAllRepoIssuesPagedFactory(): DataSource.Factory<Int, GitHubRepoIssueEntity>
+    fun getAllReposPagedFactory(): DataSource.Factory<Int, GitHubRepoEntity>
+
+    fun getAllReposLiveData(): LiveData<List<GitHubRepoEntity>>
     fun getAllRepoIssuesLiveData(): LiveData<List<GitHubRepoIssueEntity>>
     fun getOpenIssuesLiveData(): LiveData<List<GitHubRepoIssueEntity>>
     fun getClosedIssuesLiveData(): LiveData<List<GitHubRepoIssueEntity>>
 
-    suspend fun clearCache()
+    suspend fun clearRepoIssuesCache()
+    suspend fun clearReposCache()
     suspend fun loadGitHubRepoIssuesList(ownerName: String = "", repoName: String = "", pageSize: Int = NETWORK_PAGE_SIZE, page: Int = 1)
+    suspend fun loadGitHubReposList(query: String = "", pageSize: Int = NETWORK_PAGE_SIZE, page: Int = 1)
 //    suspend fun refreshGitHubRepoIssuesList(ownerName: String, repoName: String)
 
     companion object {

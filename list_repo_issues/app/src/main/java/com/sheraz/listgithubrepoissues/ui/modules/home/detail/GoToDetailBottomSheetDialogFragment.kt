@@ -25,27 +25,23 @@ class GoToDetailBottomSheetDialogFragment : BottomSheetDialogFragment() {
     private lateinit var gitHubRepoIssueItem: GitHubRepoIssueItem
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        logger.d(
-            TAG, "onCreate: ")
+        logger.d(TAG, "onCreate: ")
         super.onCreate(savedInstanceState)
         initData()
     }
 
     private fun initData() {
 
-        logger.d(
-            TAG, "initData: ")
+        logger.d(TAG, "initData: ")
         if (arguments != null && arguments!!.getParcelable<Parcelable>(ARG_REPO_DATA_ITEM) != null) {
             gitHubRepoIssueItem = arguments!!.getParcelable<Parcelable>(ARG_REPO_DATA_ITEM) as GitHubRepoIssueItem
-            logger.v(
-                TAG, "initData: gitHubRepoIssueItem: $gitHubRepoIssueItem")
+            logger.v(TAG, "initData: gitHubRepoIssueItem: $gitHubRepoIssueItem")
         }
 
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        logger.d(
-            TAG, "onCreateDialog: ")
+        logger.d(TAG, "onCreateDialog: ")
         val dialog =  super.onCreateDialog(savedInstanceState)
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
@@ -56,16 +52,14 @@ class GoToDetailBottomSheetDialogFragment : BottomSheetDialogFragment() {
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        logger.d(
-            TAG, "onCreateView: ")
+        logger.d(TAG, "onCreateView: ")
         val binding = DataBindingUtil.inflate<FragmentGoToDetailBottomSheetBinding>(
             inflater, R.layout.fragment_go_to_detail_bottom_sheet, container, false)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        logger.d(
-            TAG, "onViewCreated: ")
+        logger.d(TAG, "onViewCreated: ")
 
         super.onViewCreated(view, savedInstanceState)
 
@@ -77,27 +71,23 @@ class GoToDetailBottomSheetDialogFragment : BottomSheetDialogFragment() {
         tvCreatedAt.text = getFormattedDate(gitHubRepoIssueItem.createdAt)
 
         ibDoneAction.setOnClickListener {
-            logger.d(
-                TAG, "ibDoneAction.onClick: ")
+            logger.d(TAG, "ibDoneAction.onClick: ")
             dismiss()
         }
     }
 
     override fun onResume() {
-        logger.d(
-            TAG, "onResume: ")
+        logger.d(TAG, "onResume: ")
         super.onResume()
     }
 
     override fun onPause() {
-        logger.d(
-            TAG, "onPause: ")
+        logger.d(TAG, "onPause: ")
         super.onPause()
     }
 
     override fun onDestroy() {
-        logger.d(
-            TAG, "onDestroy: ")
+        logger.d(TAG, "onDestroy: ")
         super.onDestroy()
     }
 

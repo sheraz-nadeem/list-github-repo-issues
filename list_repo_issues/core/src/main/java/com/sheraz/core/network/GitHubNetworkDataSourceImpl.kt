@@ -113,7 +113,7 @@ class GitHubNetworkDataSourceImpl(
             logger.i(TAG, "fetchReposFromNetwork(): response is successful")
             val responseBody = response.body()
             if (responseBody != null) {
-                return Result.Success(responseBody)
+                return Result.Success(responseBody.gitHubRepoList)
             }
 
         }

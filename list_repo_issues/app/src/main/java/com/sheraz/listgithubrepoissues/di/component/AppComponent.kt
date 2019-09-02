@@ -6,8 +6,10 @@ import com.sheraz.listgithubrepoissues.di.module.CoroutinesDispatcherProviderMod
 import com.sheraz.listgithubrepoissues.di.module.HomeModule
 import com.sheraz.listgithubrepoissues.di.module.ViewModelFactoryProviderModule
 import com.sheraz.listgithubrepoissues.ui.modules.adapters.HomeAdapter
+import com.sheraz.listgithubrepoissues.ui.modules.adapters.SearchRepositoryAdapter
 import com.sheraz.listgithubrepoissues.ui.modules.home.HomeViewModel
 import com.sheraz.listgithubrepoissues.ui.modules.home.HomeViewModelFactory
+import com.sheraz.listgithubrepoissues.ui.modules.home.searchrepo.SearchRepoViewModelFactory
 import dagger.Component
 
 /**
@@ -25,7 +27,11 @@ import dagger.Component
 )
 @FeatureScope
 interface AppComponent {
+
     fun homeAdapter(): HomeAdapter
-    fun homeViewModel(): HomeViewModel
     fun homeViewModelFactory(): HomeViewModelFactory
+
+    fun searchRepoAdapter(): SearchRepositoryAdapter
+    fun searchRepoViewModelFactory(): SearchRepoViewModelFactory
+
 }

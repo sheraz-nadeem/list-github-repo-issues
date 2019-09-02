@@ -1,35 +1,36 @@
-package com.sheraz.listgithubrepoissues.ui.modules.home
+package com.sheraz.listgithubrepoissues.ui.modules.home.searchrepo
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Transformations
 import androidx.paging.LivePagedListBuilder
 import androidx.paging.PagedList
 import com.sheraz.core.data.repository.AppRepository
-import com.sheraz.core.data.sharedprefs.AppSharedPrefs
 import com.sheraz.listgithubrepoissues.extensions.toUiModel
-import com.sheraz.listgithubrepoissues.ui.models.GitHubRepoIssueItem
+import com.sheraz.listgithubrepoissues.ui.models.GitHubRepoItem
 import com.sheraz.listgithubrepoissues.ui.modules.base.BaseViewModel
 import kotlinx.coroutines.launch
 
+
 /**
- * ViewModel that is used by our HomeActivity
+ * ViewModel that is used by our [SearchRepositoryBottomSheetDialogFragment]
  * to maintain its state.
  */
 
-class HomeViewModel(
-    private val appRepository: AppRepository,
-    private val appSharedPrefs: AppSharedPrefs
+class SearchRepoViewModel(
+    private val appRepository: AppRepository
 ): BaseViewModel() {
 
 //    private val pagedListConfig: PagedList.Config
-    private val _allRepoIssuesLiveData = appRepository.getAllRepoIssuesLiveData()
-    val allRepoIssuesLiveData: LiveData<List<GitHubRepoIssueItem>> = Transformations.map(_allRepoIssuesLiveData) { entityList ->
-        entityList.map { it.toUiModel() }}
+    private val _allReposLiveData = appRepository.getAllReposLiveData()
+    val allReposLiveData: LiveData<List<GitHubRepoItem>> = Transformations.map(_allReposLiveData) {entityList ->
+        entityList.map { it.toUiModel() }
+    }
 
     val networkFetchStatusLiveData = appRepository.isFetchInProgress
     val networkErrorStatusLiveData = appRepository.networkError
 
-//    var pagedListLiveData: LiveData<PagedList<GitHubRepoIssueItem>>? = null
+//    var pagedListLiveData: LiveData<PagedList<GitHubRepoItem>>? = null
+    var lastSearchQuery = ""
 
     init {
 
@@ -48,23 +49,24 @@ class HomeViewModel(
 //        buildLivePagedList()
     }
 
-    fun loadData(ownerName: String, repoName: String, pageSize: Int = AppRepository.NETWORK_PAGE_SIZE, page: Int = 1) =
+    fun search(query: String, pageSize: Int = AppRepository.NETWORK_PAGE_SIZE, page: Int = 1) =
         scope.launch(dispatcherProvider.ioDispatcher) {
-            appRepository.loadGitHubRepoIssuesList(ownerName, repoName, pageSize, page)
+            lastSearchQuery = query
+            appRepository.loadGitHubReposList(query, pageSize, page)
         }
 
-    fun onRefresh(ownerName: String, repoName: String, pageSize: Int = AppRepository.NETWORK_PAGE_SIZE, page: Int = -1) =
+    fun onRefresh(query: String, pageSize: Int = AppRepository.NETWORK_PAGE_SIZE, page: Int = -1) =
         scope.launch(dispatcherProvider.ioDispatcher) {
-            appRepository.loadGitHubRepoIssuesList(ownerName, repoName, pageSize, page)
+            appRepository.loadGitHubReposList(query, pageSize, page)
         }
 
     fun onClearCache() = scope.launch(dispatcherProvider.ioDispatcher) {
-        appRepository.clearRepoIssuesCache()
+        appRepository.clearReposCache()
     }
 
 //    fun buildLivePagedList() {
 //        pagedListLiveData = LivePagedListBuilder(_allReposPagedFactory, pagedListConfig)
-//            .setBoundaryCallback(RepoIssuesBoundaryCallback())
+//            .setBoundaryCallback(RepoBoundaryCallback())
 //            .build()
 //    }
 
@@ -75,7 +77,7 @@ class HomeViewModel(
 
     }
 
-    inner class RepoIssuesBoundaryCallback : PagedList.BoundaryCallback<GitHubRepoIssueItem>() {
+    inner class RepoBoundaryCallback : PagedList.BoundaryCallback<GitHubRepoItem>() {
 
         /**
          * Database returned 0 items. We should query the backend for more items.
@@ -88,7 +90,7 @@ class HomeViewModel(
         /**
          * When all items in the database were loaded, we need to query the backend for more items.
          */
-        override fun onItemAtEndLoaded(itemAtEnd: GitHubRepoIssueItem) {
+        override fun onItemAtEndLoaded(itemAtEnd: GitHubRepoItem) {
             logger.d(TAG_REPO_BOUNDARY_CALLBACK, "onItemAtEndLoaded(): ")
             if (appRepository.noMoreItemsAvailable.value!!) return
             requestAndSaveData()
@@ -98,18 +100,15 @@ class HomeViewModel(
 
             if (appRepository.isFetchInProgress.value!!) return
 
-            val ownerName = appSharedPrefs.get(AppSharedPrefs.SELECTED_GITHUB_REPO_OWNER_KEY, AppSharedPrefs.DEFAULT_GITHUB_REPO_OWNER) ?: AppSharedPrefs.DEFAULT_GITHUB_REPO_OWNER
-            val repoName = appSharedPrefs.get(AppSharedPrefs.SELECTED_GITHUB_REPO_NAME_KEY, AppSharedPrefs.DEFAULT_GITHUB_REPO_NAME) ?: AppSharedPrefs.DEFAULT_GITHUB_REPO_NAME
-            logger.i(TAG, "requestAndSaveData(): ownerName: $ownerName, repoName: $repoName")
-
-            loadData(ownerName, repoName)
+            logger.d(TAG_REPO_BOUNDARY_CALLBACK, "onItemAtEndLoaded(): lastSearchQuery: $lastSearchQuery")
+            search(lastSearchQuery)
 
         }
     }
 
     companion object {
-        private val TAG = HomeViewModel::class.java.simpleName
-        private val TAG_REPO_BOUNDARY_CALLBACK: String = RepoIssuesBoundaryCallback::class.java.simpleName
+        private val TAG = SearchRepoViewModel::class.java.simpleName
+        private val TAG_REPO_BOUNDARY_CALLBACK: String = RepoBoundaryCallback::class.java.simpleName
 
         const val DATABASE_PAGE_SIZE = 20
         const val PREFETCH_DISTANCE = 5

@@ -2,4 +2,6 @@
     <string name="app_name">ListGitHubRepoIssues</string>
 
     <string name="clear_local_db_cache_menu_text">Clear local cache</string>
+    <string name="select_repo_text">Search &amp; Select GitHub Repository</string>
+    <string name="search_repo_text">Search GitHub Repository</string>
 </resources>
