@@ -157,7 +157,8 @@ class HomeActivity : BaseActivityToolbar<ActivityHomeBinding, HomeViewModel>(), 
 
         logger.e(TAG, "handleNetworkError(): exception: $exception")
         swipeRefreshLayout.isRefreshing = false
-        Snackbar.make(activityHomeBinding?.root!!, exception.message.toString(), Snackbar.LENGTH_LONG).show()
+        val snackbar = Snackbar.make(activityHomeBinding?.root!!, exception.message.toString(), Snackbar.LENGTH_LONG)
+        snackbar.setAction("Retry") { loadData() }
 
         if (homeAdapter.currentList?.isEmpty()!!) {
             llNoData.visibility = View.VISIBLE

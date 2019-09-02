@@ -46,10 +46,10 @@ class NetworkModule {
     @Provides
     @Singleton
     fun provideOkHttpClient(context: Context, httpLoggingInterceptor: HttpLoggingInterceptor) : OkHttpClient {
-        val cache = Cache(context.cacheDir, CACHE_SIZE)
+//        val cache = Cache(context.cacheDir, CACHE_SIZE)
         return OkHttpClient.Builder()
             .addInterceptor(httpLoggingInterceptor)
-            .cache(cache)
+//            .cache(cache)
             .build()
     }
 

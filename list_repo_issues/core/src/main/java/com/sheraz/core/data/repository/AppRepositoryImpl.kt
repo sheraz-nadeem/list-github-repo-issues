@@ -175,7 +175,11 @@ class AppRepositoryImpl(
 
         try {
 
-            if (gitHubRepoIssueEntityList.size < AppRepository.NETWORK_PAGE_SIZE) _noMoreItemsAvailable.postValue(true)
+            if (gitHubRepoIssueEntityList.size < AppRepository.NETWORK_PAGE_SIZE) {
+                _noMoreItemsAvailable.postValue(true)
+            } else {
+                _noMoreItemsAvailable.postValue(false)
+            }
 
             if (gitHubRepoIssueEntityList.isNotEmpty()) {
                 gitHubRepoIssueEntityDao.insertList(gitHubRepoIssueEntityList)
@@ -246,7 +250,11 @@ class AppRepositoryImpl(
 
         try {
 
-            if (gitHubRepoEntityList.size < AppRepository.NETWORK_PAGE_SIZE) _noMoreItemsAvailable.postValue(true)
+            if (gitHubRepoEntityList.size < AppRepository.NETWORK_PAGE_SIZE) {
+                _noMoreItemsAvailable.postValue(true)
+            } else {
+                _noMoreItemsAvailable.postValue(false)
+            }
 
             if (gitHubRepoEntityList.isNotEmpty()) {
                 gitHubRepoEntityDao.insertList(gitHubRepoEntityList)
