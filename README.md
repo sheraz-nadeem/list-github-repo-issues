@@ -1,25 +1,38 @@
-# Joyn - Coding Challenge Android
 
-The goal is to implement a native android app using the latest tech stack and android's architecture patterns. This app gives the user the posibility to show a list of all the issues of a specific GitHub repository, if a user choose an issue of interest the app will also display a detail screen to see what the particular issue is about.
+This application is created to show how paging library can be used to load infinite lists and used in conjunction with Network fetch & Room Database.
 
-### Functional Requirements
+This app gives the user the ability to show a list of all the issues of a specific GitHub repository, if a user choose an issue of interest the app will also display a detail screen to see what the particular issue is about.
+
+Tech Stack Used
+---------------
+1. **Android Architecture Components** (Room Database, LiveData, Paging Library(PagedList, PagedListAdapter)).
+2. Application Architecture is **MVVM**.
+3. Networking using [Retrofit 2](https://github.com/square/retrofit).
+4. Used **Kotlin**.
+5. Used **Kotlin Coroutines** for Async Operations.
+6. Used [Retrofit 2 Adapter for Kotlin Coroutine's Deferred type](https://github.com/JakeWharton/retrofit2-kotlin-coroutines-adapter).
+7. Whole project is based on [AndroidX](https://developer.android.com/jetpack/androidx/).
+8. Used [Dagger 2](https://github.com/google/dagger) for Dependency Injection.
+9. [Picasso](https://github.com/square/picasso) for Image handling.
+
 
 #### 1. List of Issues screen
 
-This screen should show a lists with all the issues of a repository of your choice (***See:*** _G. Repository selection_):
+This screen shows a list with all the issues of a repository of our choice.
 
-    A. Implement lazy loading of list items.
-    B. Implement a way to refresh the list.
-    C. Loading indicator while data being fetch.
+    A. Implemented lazy loading of list items.
+    B. Implemented a way to refresh the list.
+    C. Loading indicator shows up while data being fetched.
     D. A way for a user to retry when loading fails.
     E. Restore screen state on screen orientation change.
-    F. Tapping a list entry should open a detail view of the issue.
-    G. Repository selection: give the user the option to enter the name/repository_id he wants to see. In case the user has not enter it provide a default value of your preference.
+    F. Tapping a list entry opens a detail view of the issue.
+    G. Repository selection works by giving user the ability to use Search Repository option in the menu item. In case, the user has not entered anything then we use a default value of our preference.
         Eg. 'tensorflow' ~> https://github.com/tensorflow/tensorflow.
+
 
 #### 2. Issue's Detail screen
 
-The detail screen should display:
+The detail screen displays:
 
     A. Issue's title
     B. Issue's body
@@ -27,28 +40,8 @@ The detail screen should display:
     D. Author’s login
     E. created_at`
 
-### C. Deliverables
 
-    - Instructions to build the app.
-    - Assembled Apk file under a 'build' folder, placed in the root of the project.
-
-_Be prepared to show the code and the app demo during the follow up interview._
-
-### Evaluation criterias
-We will pay extra attention to the following aspects of your app:
-
-- App architecture. Please implement architecture you would use in a production app.
-- Modularity of your code. Separation of concerns.
-- Testability. Cover your code with automated tests.
-- General code style and code cleanliness.
-- Material design. Follow Android design guidelines.
-
-__Note:__ _You should strongly prefer fulfilling these requirements than doing the optional tasks._
-
-### Relevant links
-_[https://developer.github.com/v3/](https://developer.github.com/v3/)_
-
-#### *Optional Tasks*
+#### *TODOs*
 
     - Implement a search field which allows the user to filter issues list by keywords, which
     could be contained in either title or body of an issue.
