@@ -4,12 +4,15 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.paging.PagedList
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
 import com.sheraz.core.data.repository.AppRepository
 import com.sheraz.core.data.sharedprefs.AppSharedPrefs
+import com.sheraz.core.data.sharedprefs.getGitHubRepoName
+import com.sheraz.core.data.sharedprefs.getGitHubRepoOwner
 import com.sheraz.listgithubrepoissues.BR
 import com.sheraz.listgithubrepoissues.R
 import com.sheraz.listgithubrepoissues.databinding.ActivityHomeBinding
@@ -30,6 +33,7 @@ import kotlinx.android.synthetic.main.activity_home.*
 class HomeActivity : BaseActivityToolbar<ActivityHomeBinding, HomeViewModel>(), SearchRepositoryBottomSheetDialogFragment.OnChooseRepositoryListener {
 
     private var activityHomeBinding: ActivityHomeBinding? = null
+    private lateinit var pagedListLiveData: LiveData<PagedList<GitHubRepoIssueItem>>
 
     private var ownerName = ""
     private var repoName = ""
@@ -65,19 +69,26 @@ class HomeActivity : BaseActivityToolbar<ActivityHomeBinding, HomeViewModel>(), 
         performDataBinding()
         activityHomeBinding = getViewDataBinding()
 
+        initData()
         initUI()
         setUpListeners()
-        subscribeUi()
     }
 
     override fun onResume() {
         logger.d(TAG, "onResume(): ")
         super.onResume()
+        subscribeUi()
     }
 
     override fun onPause() {
         logger.d(TAG, "onPause(): ")
         super.onPause()
+
+        // We don't really need to do this as we are observing LiveData
+        // and LiveData is lifecycle-aware, so as soon as the activity
+        // moves to Lifecycle.State#DESTROYED state the observer will
+        // be automatically removed.
+        unsubscribeUi()
     }
 
     override fun getLayoutResId() = R.layout.activity_home
@@ -85,6 +96,14 @@ class HomeActivity : BaseActivityToolbar<ActivityHomeBinding, HomeViewModel>(), 
     override fun getBindingVariable() = BR.homeViewModel
 
     override fun getViewModel() = homeViewModel
+
+    override fun initData() {
+
+        ownerName = appSharedPrefs.getGitHubRepoOwner()
+        repoName = appSharedPrefs.getGitHubRepoName()
+        logger.i(TAG, "initData(): ownerName: $ownerName, repoName: $repoName")
+
+    }
 
     override fun initUI() {
 
@@ -100,10 +119,20 @@ class HomeActivity : BaseActivityToolbar<ActivityHomeBinding, HomeViewModel>(), 
 
         logger.d(TAG, "subscribeUi(): ")
 
-        homeViewModel.pagedListLiveData?.observe(this, pagedListObserver)
+        if (!isActivityRecreated) pagedListLiveData = homeViewModel.buildLivePagedList()
+        pagedListLiveData.observe(this, pagedListObserver)
         homeViewModel.networkFetchStatusLiveData.observe(this, loadingStatusObserver)
         homeViewModel.networkErrorStatusLiveData.observe(this, networkErrorObserver)
-        if (!isActivityRecreated) loadData()
+
+    }
+
+    override fun unsubscribeUi() {
+
+        logger.d(TAG, "unsubscribeUi(): ")
+
+        pagedListLiveData.removeObservers(this)
+        homeViewModel.networkFetchStatusLiveData.removeObservers(this)
+        homeViewModel.networkErrorStatusLiveData.removeObservers(this)
 
     }
 
@@ -122,10 +151,7 @@ class HomeActivity : BaseActivityToolbar<ActivityHomeBinding, HomeViewModel>(), 
 
     private fun loadData() {
 
-        ownerName = appSharedPrefs.get(AppSharedPrefs.SELECTED_GITHUB_REPO_OWNER_KEY, AppSharedPrefs.DEFAULT_GITHUB_REPO_OWNER) ?: AppSharedPrefs.DEFAULT_GITHUB_REPO_OWNER
-        repoName = appSharedPrefs.get(AppSharedPrefs.SELECTED_GITHUB_REPO_NAME_KEY, AppSharedPrefs.DEFAULT_GITHUB_REPO_NAME) ?: AppSharedPrefs.DEFAULT_GITHUB_REPO_NAME
-        logger.i(TAG, "loadData(): ownerName: $ownerName, repoName: $repoName")
-
+        logger.d(TAG, "loadData(): ownerName: $ownerName, repoName: $repoName")
         homeViewModel.loadData(ownerName, repoName)
 
     }
@@ -181,19 +207,24 @@ class HomeActivity : BaseActivityToolbar<ActivityHomeBinding, HomeViewModel>(), 
     private fun handleClearCache() {
 
         logger.d(TAG, "handleClearCache(): ")
-        homeViewModel.pagedListLiveData?.removeObservers(this)
-        homeViewModel.onClearCache()
-        homeAdapter.currentList?.dataSource?.invalidate()
-        homeViewModel.buildLivePagedList()
-        homeViewModel.pagedListLiveData?.observe(this, pagedListObserver)
 
+        homeViewModel.onClearCache()
+
+//        homeViewModel.pagedListLiveData?.removeObservers(this)
+//        logger.v(TAG, "handleClearCache(): pagedListLiveData.hasObservers = ${homeViewModel.pagedListLiveData?.hasObservers()}, \n" +
+//                "pagedListLiveData.hasActiveObservers = ${homeViewModel.pagedListLiveData?.hasActiveObservers()}")
+
+        homeAdapter.currentList?.dataSource?.invalidate()
+//        homeViewModel.buildLivePagedList()
+//        homeViewModel.pagedListLiveData?.observe(this, pagedListObserver)
+//        logger.v(TAG, "handleClearCache(): pagedListLiveData.hasObservers = ${homeViewModel.pagedListLiveData?.hasObservers()}, \n" +
+//                "pagedListLiveData.hasActiveObservers = ${homeViewModel.pagedListLiveData?.hasActiveObservers()}")
     }
 
     private fun handleSearchRepo() {
 
         logger.d(TAG, "handleSearchRepo(): ")
-        homeViewModel.networkFetchStatusLiveData.removeObservers(this)
-        homeViewModel.networkErrorStatusLiveData.removeObservers(this)
+        unsubscribeUi()
         openSearchRepoBottomSheet()
 
     }
@@ -228,12 +259,8 @@ class HomeActivity : BaseActivityToolbar<ActivityHomeBinding, HomeViewModel>(), 
     override fun onChooseRepository() {
 
         logger.d(TAG, "onChooseRepository(): ")
-
-        handleClearCache()
-        homeViewModel.networkFetchStatusLiveData.observe(this, loadingStatusObserver)
-        homeViewModel.networkErrorStatusLiveData.observe(this, networkErrorObserver)
-
-        loadData()
+        homeAdapter.currentList?.dataSource?.invalidate()
+        subscribeUi()
 
     }
 

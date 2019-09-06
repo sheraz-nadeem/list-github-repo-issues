@@ -55,6 +55,11 @@ abstract class BaseActivity<VIEW_DATA_BINDING : ViewDataBinding, VIEW_MODEL : Ba
      * Abstract Methods
      **********/
 
+    /**
+     * Child classes will use this method to
+     * initialize their data in this method
+     */
+    abstract fun initData()
 
     /**
      * Child classes will use this method to
@@ -82,9 +87,16 @@ abstract class BaseActivity<VIEW_DATA_BINDING : ViewDataBinding, VIEW_MODEL : Ba
     abstract fun getViewModel(): VIEW_MODEL
 
     /**
-     * Override for subscribing to live data
+     * Override for subscribing observers to get
+     * updates from reactive streams of data
      */
     abstract fun subscribeUi()
+
+    /**
+     * Override to unsubscribe any observers,
+     * when needed
+     */
+    abstract fun unsubscribeUi()
 
 
     companion object {
