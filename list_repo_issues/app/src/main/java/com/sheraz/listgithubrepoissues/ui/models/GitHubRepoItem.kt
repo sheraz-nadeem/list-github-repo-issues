@@ -26,4 +26,22 @@ data class GitHubRepoItem(
         return (item.id == this.id && item.repoId == this.repoId)
 
     }
+
+    override fun toString(): String {
+        return "GitHubRepoItem => {\n" +
+                "id = ${this.id}, \n" +
+                "repoId = ${this.repoId}, \n" +
+                "fullName = ${this.fullName}, \n" +
+                "name = ${this.name}, \n" +
+                "isRepoPrivate = ${this.isRepoPrivate}, \n" +
+                "htmlUrl = ${this.htmlUrl}, \n" +
+                "url = ${this.url}, \n" +
+                "description = ${this.description}, \n" +
+                "fork = ${this.fork}, \n" +
+                "ownerAvatarUrl = ${this.ownerAvatarUrl}, \n" +
+                "ownerHtmlUrl = ${this.ownerHtmlUrl}, \n" +
+                "ownerType = ${this.ownerType}, \n" +
+                "ownerLogin = ${this.ownerLogin} \n" +
+                "}"
+    }
 }

@@ -29,4 +29,20 @@ data class GitHubRepoIssueItem(
         return (item.id == this.id && item.issueId == this.issueId)
 
     }
+
+    override fun toString(): String {
+        return "GitHubRepoItem => {\n" +
+                "id = ${this.id}, \n" +
+                "issueId = ${this.issueId}, \n" +
+                "title = ${this.title}, \n" +
+                "body = ${this.body}, \n" +
+                "state = ${this.state}, \n" +
+                "authorLogin = ${this.authorLogin}, \n" +
+                "createdAt = ${this.createdAt}, \n" +
+                "comments = ${this.comments}, \n" +
+                "repositoryUrl = ${this.repositoryUrl}, \n" +
+                "authorAvatarUrl = ${this.authorAvatarUrl}, \n" +
+                "authorAssociation = ${this.authorAssociation} \n" +
+                "}"
+    }
 }
