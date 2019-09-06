@@ -1,13 +1,14 @@
 package com.sheraz.listgithubrepoissues.ui.modules.home.searchrepo
 
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.Transformations
 import androidx.paging.LivePagedListBuilder
 import androidx.paging.PagedList
 import com.sheraz.core.data.repository.AppRepository
 import com.sheraz.listgithubrepoissues.extensions.toUiModel
 import com.sheraz.listgithubrepoissues.ui.models.GitHubRepoItem
+import com.sheraz.listgithubrepoissues.ui.modules.base.BaseBoundaryCallback
 import com.sheraz.listgithubrepoissues.ui.modules.base.BaseViewModel
+import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 
 
@@ -46,11 +47,12 @@ class SearchRepoViewModel(
         buildLivePagedList()
     }
 
-    fun search(query: String, pageSize: Int = AppRepository.NETWORK_PAGE_SIZE, page: Int = 1) =
+    fun search(query: String, pageSize: Int = AppRepository.NETWORK_PAGE_SIZE, page: Int = 1) {
         scope.launch(dispatcherProvider.ioDispatcher) {
             lastSearchQuery = query
             appRepository.loadGitHubReposList(query, pageSize, page)
         }
+    }
 
     fun onRefresh(query: String, pageSize: Int = AppRepository.NETWORK_PAGE_SIZE, page: Int = -1) =
         scope.launch(dispatcherProvider.ioDispatcher) {
@@ -58,12 +60,13 @@ class SearchRepoViewModel(
         }
 
     fun onClearCache() = scope.launch(dispatcherProvider.ioDispatcher) {
-        appRepository.clearReposCache()
+        async { appRepository.clearRepoIssuesCache() }.await()
+        async { appRepository.clearReposCache() }.await()
     }
 
     fun buildLivePagedList() {
         pagedListLiveData = LivePagedListBuilder(_allReposPagedFactory, pagedListConfig)
-            .setBoundaryCallback(RepoBoundaryCallback())
+            .setBoundaryCallback(GitHubRepoBoundaryCallback())
             .build()
     }
 
@@ -74,38 +77,22 @@ class SearchRepoViewModel(
 
     }
 
-    inner class RepoBoundaryCallback : PagedList.BoundaryCallback<GitHubRepoItem>() {
+    inner class GitHubRepoBoundaryCallback: BaseBoundaryCallback<GitHubRepoItem>(logger, appRepository) {
 
-        /**
-         * Database returned 0 items. We should query the backend for more items.
-         */
-        override fun onZeroItemsLoaded() {
-            logger.d(TAG_REPO_BOUNDARY_CALLBACK, "onZeroItemsLoaded(): ")
-            requestAndSaveData()
+        override fun requestData(isLastItem: Boolean) = when (appRepository.isFetchInProgress.value!!) {
+
+            true -> logger.v(TAG_REPO_BOUNDARY_CALLBACK, "requestData(): isLastItem = $isLastItem, NETWORK FETCH is already in progress")
+            false -> {
+                logger.d(TAG_REPO_BOUNDARY_CALLBACK, "requestData(): isLastItem = $isLastItem, lastSearchQuery: $lastSearchQuery")
+                search(lastSearchQuery)
+            }
         }
 
-        /**
-         * When all items in the database were loaded, we need to query the backend for more items.
-         */
-        override fun onItemAtEndLoaded(itemAtEnd: GitHubRepoItem) {
-            logger.d(TAG_REPO_BOUNDARY_CALLBACK, "onItemAtEndLoaded(): ")
-            if (appRepository.noMoreItemsAvailable.value!!) return
-            requestAndSaveData()
-        }
-
-        private fun requestAndSaveData() {
-
-            if (appRepository.isFetchInProgress.value!!) return
-
-            logger.d(TAG_REPO_BOUNDARY_CALLBACK, "onItemAtEndLoaded(): lastSearchQuery: $lastSearchQuery")
-            search(lastSearchQuery)
-
-        }
     }
 
     companion object {
         private val TAG = SearchRepoViewModel::class.java.simpleName
-        private val TAG_REPO_BOUNDARY_CALLBACK: String = RepoBoundaryCallback::class.java.simpleName
+        private val TAG_REPO_BOUNDARY_CALLBACK: String = GitHubRepoBoundaryCallback::class.java.simpleName
 
         const val DATABASE_PAGE_SIZE = 20
         const val PREFETCH_DISTANCE = 5
