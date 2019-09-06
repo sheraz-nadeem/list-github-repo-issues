@@ -37,7 +37,7 @@ class NetworkModule {
 
         return HttpLoggingInterceptor(httpLogger).also {
             it.level = when(BuildConfig.DEBUG) {
-                true -> HttpLoggingInterceptor.Level.BODY
+                true -> HttpLoggingInterceptor.Level.BASIC
                 false -> HttpLoggingInterceptor.Level.NONE
             }
         }
