@@ -1,16 +1,11 @@
 package com.sheraz.listgithubrepoissues.ui.modules.home.searchrepo
 
 import android.app.Dialog
-import android.content.Context
 import android.content.DialogInterface
 import android.os.Build
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
-import android.util.DisplayMetrics
 import android.view.*
 import android.view.inputmethod.EditorInfo
-import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.paging.PagedList
@@ -18,6 +13,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.snackbar.Snackbar
 import com.sheraz.core.data.sharedprefs.AppSharedPrefs
+import com.sheraz.core.data.sharedprefs.getGitHubRepoName
+import com.sheraz.core.data.sharedprefs.getGitHubRepoOwner
 import com.sheraz.listgithubrepoissues.R
 import com.sheraz.listgithubrepoissues.databinding.FragmentSearchRepositoryBottomSheetBinding
 import com.sheraz.listgithubrepoissues.di.Injector
@@ -79,9 +76,6 @@ class SearchRepositoryBottomSheetDialogFragment: BottomSheetDialogFragment(), Di
             DataBindingUtil.inflate(
                 inflater, R.layout.fragment_search_repository_bottom_sheet, container, false)
 
-//        if (dialog != null && dialog.window != null)
-//            dialog.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
-
         return fragmentSearchRepositoryBottomSheetBinding.root
 
     }
@@ -98,7 +92,6 @@ class SearchRepositoryBottomSheetDialogFragment: BottomSheetDialogFragment(), Di
         super.onViewCreated(view, savedInstanceState)
         initUI()
         setUpListeners()
-        subscribeUi()
 
     }
 
@@ -155,7 +148,7 @@ class SearchRepositoryBottomSheetDialogFragment: BottomSheetDialogFragment(), Di
                 val repoName = gitHubRepoItem.name
                 logger.d(TAG, "itemSelected(): ownerName: $ownerName, repoName: $repoName")
 
-                handleClearCache()
+                searchRepoViewModel.onClearCache()
 
                 appSharedPrefs.set(AppSharedPrefs.SELECTED_GITHUB_REPO_OWNER_KEY, ownerName)
                 appSharedPrefs.set(AppSharedPrefs.SELECTED_GITHUB_REPO_NAME_KEY, repoName)
@@ -177,11 +170,21 @@ class SearchRepositoryBottomSheetDialogFragment: BottomSheetDialogFragment(), Di
         searchRepoViewModel.networkFetchStatusLiveData.observe(this, loadingStatusObserver)
         searchRepoViewModel.networkErrorStatusLiveData.observe(this, networkErrorObserver)
 
-        val ownerName = appSharedPrefs.get(AppSharedPrefs.SELECTED_GITHUB_REPO_OWNER_KEY, AppSharedPrefs.DEFAULT_GITHUB_REPO_OWNER) ?: AppSharedPrefs.DEFAULT_GITHUB_REPO_OWNER
-        val repoName = appSharedPrefs.get(AppSharedPrefs.SELECTED_GITHUB_REPO_NAME_KEY, AppSharedPrefs.DEFAULT_GITHUB_REPO_NAME)
+        val ownerName = appSharedPrefs.getGitHubRepoOwner()
+        val repoName = appSharedPrefs.getGitHubRepoName()
         logger.d(TAG, "subscribeUi(): ownerName: $ownerName, repoName: $repoName")
 
         searchRepoViewModel.search(ownerName)
+
+    }
+
+    private fun unsubscribeUi() {
+
+        logger.d(TAG, "unsubscribeUi(): ")
+
+        searchRepoViewModel.pagedListLiveData?.removeObservers(this)
+        searchRepoViewModel.networkFetchStatusLiveData.removeObservers(this)
+        searchRepoViewModel.networkErrorStatusLiveData.removeObservers(this)
 
     }
 
@@ -215,11 +218,13 @@ class SearchRepositoryBottomSheetDialogFragment: BottomSheetDialogFragment(), Di
     override fun onResume() {
         logger.d(TAG, "onResume(): ")
         super.onResume()
+        subscribeUi()
     }
 
     override fun onPause() {
         logger.d(TAG, "onPause(): ")
         super.onPause()
+        unsubscribeUi()
     }
 
     override fun onDestroy() {
