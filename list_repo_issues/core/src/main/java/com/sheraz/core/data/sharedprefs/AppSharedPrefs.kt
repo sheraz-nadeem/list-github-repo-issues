@@ -1,6 +1,10 @@
 package com.sheraz.core.data.sharedprefs
 
 import android.content.SharedPreferences
+import com.sheraz.core.data.sharedprefs.AppSharedPrefs.Companion.DEFAULT_GITHUB_REPO_NAME
+import com.sheraz.core.data.sharedprefs.AppSharedPrefs.Companion.DEFAULT_GITHUB_REPO_OWNER
+import com.sheraz.core.data.sharedprefs.AppSharedPrefs.Companion.SELECTED_GITHUB_REPO_NAME_KEY
+import com.sheraz.core.data.sharedprefs.AppSharedPrefs.Companion.SELECTED_GITHUB_REPO_OWNER_KEY
 import javax.inject.Inject
 
 /**
@@ -13,6 +17,14 @@ fun SharedPreferences.saveBoolean(valueKey: String, value: Boolean) = edit().put
 fun SharedPreferences.saveLong(valueKey: String, value: Long) = edit().putLong(valueKey, value).apply()
 fun SharedPreferences.saveFloat(valueKey: String, value: Float) = edit().putFloat(valueKey, value).apply()
 fun SharedPreferences.clearPrefs() = edit().clear().apply()
+
+
+/**
+ * Extension functions for [AppSharedPrefs] class
+ */
+
+fun AppSharedPrefs.getGitHubRepoOwner() = this.get(SELECTED_GITHUB_REPO_OWNER_KEY, DEFAULT_GITHUB_REPO_OWNER) ?: DEFAULT_GITHUB_REPO_OWNER
+fun AppSharedPrefs.getGitHubRepoName() = this.get(SELECTED_GITHUB_REPO_NAME_KEY, DEFAULT_GITHUB_REPO_NAME) ?: DEFAULT_GITHUB_REPO_NAME
 
 
 class AppSharedPrefs @Inject constructor(private val sharedPreferences: SharedPreferences) {
