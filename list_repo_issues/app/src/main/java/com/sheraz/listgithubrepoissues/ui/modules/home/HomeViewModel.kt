@@ -5,9 +5,13 @@ import androidx.paging.LivePagedListBuilder
 import androidx.paging.PagedList
 import com.sheraz.core.data.repository.AppRepository
 import com.sheraz.core.data.sharedprefs.AppSharedPrefs
+import com.sheraz.core.data.sharedprefs.getGitHubRepoName
+import com.sheraz.core.data.sharedprefs.getGitHubRepoOwner
 import com.sheraz.listgithubrepoissues.extensions.toUiModel
 import com.sheraz.listgithubrepoissues.ui.models.GitHubRepoIssueItem
+import com.sheraz.listgithubrepoissues.ui.modules.base.BaseBoundaryCallback
 import com.sheraz.listgithubrepoissues.ui.modules.base.BaseViewModel
+import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 
 /**
@@ -26,8 +30,6 @@ class HomeViewModel(
     val networkFetchStatusLiveData = appRepository.isFetchInProgress
     val networkErrorStatusLiveData = appRepository.networkError
 
-    var pagedListLiveData: LiveData<PagedList<GitHubRepoIssueItem>>? = null
-
     init {
 
         logger.d(TAG, "init(): ")
@@ -42,13 +44,13 @@ class HomeViewModel(
                 .setEnablePlaceholders(false)
                 .build()
 
-        buildLivePagedList()
     }
 
-    fun loadData(ownerName: String, repoName: String, pageSize: Int = AppRepository.NETWORK_PAGE_SIZE, page: Int = 1) =
+    fun loadData(ownerName: String, repoName: String, pageSize: Int = AppRepository.NETWORK_PAGE_SIZE, page: Int = 1) {
         scope.launch(dispatcherProvider.ioDispatcher) {
             appRepository.loadGitHubRepoIssuesList(ownerName, repoName, pageSize, page)
         }
+    }
 
     fun onRefresh(ownerName: String, repoName: String, pageSize: Int = AppRepository.NETWORK_PAGE_SIZE, page: Int = -1) =
         scope.launch(dispatcherProvider.ioDispatcher) {
@@ -56,12 +58,15 @@ class HomeViewModel(
         }
 
     fun onClearCache() = scope.launch(dispatcherProvider.ioDispatcher) {
-        appRepository.clearRepoIssuesCache()
+        logger.d(TAG, "onClearCache(): ")
+        async { appRepository.clearRepoIssuesCache() }.await()
+        async { appRepository.clearReposCache() }.await()
     }
 
-    fun buildLivePagedList() {
-        pagedListLiveData = LivePagedListBuilder(_allRepoIssuesPagedFactory, pagedListConfig)
-            .setBoundaryCallback(RepoIssuesBoundaryCallback())
+    fun buildLivePagedList(): LiveData<PagedList<GitHubRepoIssueItem>> {
+        logger.d(TAG, "buildLivePagedList(): ")
+        return LivePagedListBuilder(_allRepoIssuesPagedFactory, pagedListConfig)
+            .setBoundaryCallback(GitHubRepoIssuesBoundaryCallback())
             .build()
     }
 
@@ -72,41 +77,28 @@ class HomeViewModel(
 
     }
 
-    inner class RepoIssuesBoundaryCallback : PagedList.BoundaryCallback<GitHubRepoIssueItem>() {
+    inner class GitHubRepoIssuesBoundaryCallback: BaseBoundaryCallback<GitHubRepoIssueItem>(logger, appRepository) {
 
-        /**
-         * Database returned 0 items. We should query the backend for more items.
-         */
-        override fun onZeroItemsLoaded() {
-            logger.d(TAG_REPO_BOUNDARY_CALLBACK, "onZeroItemsLoaded(): ")
-            requestAndSaveData()
+        override fun requestData(isLastItem: Boolean) = when (appRepository.isFetchInProgress.value!!) {
+
+            true -> logger.v(TAG_REPO_BOUNDARY_CALLBACK, "requestData(): isLastItem = $isLastItem, NETWORK FETCH is already in progress")
+            false -> {
+
+                val ownerName = appSharedPrefs.getGitHubRepoOwner()
+                val repoName = appSharedPrefs.getGitHubRepoName()
+
+                logger.i(TAG_REPO_BOUNDARY_CALLBACK, "requestData(): isLastItem = $isLastItem, ownerName: $ownerName, repoName: $repoName")
+
+                loadData(ownerName, repoName)
+
+            }
         }
 
-        /**
-         * When all items in the database were loaded, we need to query the backend for more items.
-         */
-        override fun onItemAtEndLoaded(itemAtEnd: GitHubRepoIssueItem) {
-            logger.d(TAG_REPO_BOUNDARY_CALLBACK, "onItemAtEndLoaded(): ")
-            if (appRepository.noMoreItemsAvailable.value!!) return
-            requestAndSaveData()
-        }
-
-        private fun requestAndSaveData() {
-
-            if (appRepository.isFetchInProgress.value!!) return
-
-            val ownerName = appSharedPrefs.get(AppSharedPrefs.SELECTED_GITHUB_REPO_OWNER_KEY, AppSharedPrefs.DEFAULT_GITHUB_REPO_OWNER) ?: AppSharedPrefs.DEFAULT_GITHUB_REPO_OWNER
-            val repoName = appSharedPrefs.get(AppSharedPrefs.SELECTED_GITHUB_REPO_NAME_KEY, AppSharedPrefs.DEFAULT_GITHUB_REPO_NAME) ?: AppSharedPrefs.DEFAULT_GITHUB_REPO_NAME
-            logger.i(TAG, "requestAndSaveData(): ownerName: $ownerName, repoName: $repoName")
-
-            loadData(ownerName, repoName)
-
-        }
     }
 
     companion object {
         private val TAG = HomeViewModel::class.java.simpleName
-        private val TAG_REPO_BOUNDARY_CALLBACK: String = RepoIssuesBoundaryCallback::class.java.simpleName
+        private val TAG_REPO_BOUNDARY_CALLBACK: String = GitHubRepoIssuesBoundaryCallback::class.java.simpleName
 
         const val DATABASE_PAGE_SIZE = 20
         const val PREFETCH_DISTANCE = 5
