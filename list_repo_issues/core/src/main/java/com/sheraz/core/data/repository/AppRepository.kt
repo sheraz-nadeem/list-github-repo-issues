@@ -32,8 +32,8 @@ interface AppRepository {
 
     suspend fun clearRepoIssuesCache()
     suspend fun clearReposCache()
-    suspend fun loadGitHubRepoIssuesList(ownerName: String = "", repoName: String = "", pageSize: Int = NETWORK_PAGE_SIZE, page: Int = 1)
-    suspend fun loadGitHubReposList(query: String = "", pageSize: Int = NETWORK_PAGE_SIZE, page: Int = 1)
+    suspend fun loadGitHubRepoIssuesList(resetMoreItemsAvailable: Boolean = false, ownerName: String = "", repoName: String = "", pageSize: Int = NETWORK_PAGE_SIZE, page: Int = 1)
+    suspend fun loadGitHubReposList(resetMoreItemsAvailable: Boolean = false, query: String = "", pageSize: Int = NETWORK_PAGE_SIZE, page: Int = 1)
 //    suspend fun refreshGitHubRepoIssuesList(ownerName: String, repoName: String)
 
     companion object {

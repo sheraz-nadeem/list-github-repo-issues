@@ -118,11 +118,13 @@ class AppRepositoryImpl(
     /**
      * Method that sends request using [GitHubNetworkDataSource] and also persist data in local cache
      */
-    override suspend fun loadGitHubRepoIssuesList(ownerName: String,
+    override suspend fun loadGitHubRepoIssuesList(resetMoreItemsAvailable: Boolean,
+                                                  ownerName: String,
                                                   repoName: String,
                                                   pageSize: Int,
                                                   page: Int) {
-        logger.d(TAG, "loadGitHubRepoIssuesList(): ")
+        logger.d(TAG, "loadGitHubRepoIssuesList(): resetMoreItemsAvailable = $resetMoreItemsAvailable")
+        if (resetMoreItemsAvailable) _noMoreItemsAvailable.postValue(false)
         fetchGitHubRepoIssuesAndPersist(ownerName, repoName, pageSize, page)
     }
 
@@ -171,8 +173,6 @@ class AppRepositoryImpl(
      */
     private fun persistDownloadedGitHubRepoIssuesList(gitHubRepoIssueEntityList: List<GitHubRepoIssueEntity>) {
 
-        logger.d(TAG,"persistDownloadedGitHubRepoIssuesList(): gitHubRepoIssueEntityList.size: ${gitHubRepoIssueEntityList.size}")
-
         try {
 
             if (gitHubRepoIssueEntityList.size < AppRepository.NETWORK_PAGE_SIZE) {
@@ -180,6 +180,8 @@ class AppRepositoryImpl(
             } else {
                 _noMoreItemsAvailable.postValue(false)
             }
+
+            logger.d(TAG,"persistDownloadedGitHubRepoIssuesList(): gitHubRepoIssueEntityList.size: ${gitHubRepoIssueEntityList.size}")
 
             if (gitHubRepoIssueEntityList.isNotEmpty()) {
                 gitHubRepoIssueEntityDao.insertList(gitHubRepoIssueEntityList)
@@ -196,10 +198,12 @@ class AppRepositoryImpl(
     /**
      * Method that sends request using [GitHubNetworkDataSource] and also persist data in local cache
      */
-    override suspend fun loadGitHubReposList(query: String,
-                                                  pageSize: Int,
-                                                  page: Int) {
-        logger.d(TAG, "loadGitHubReposList(): ")
+    override suspend fun loadGitHubReposList(resetMoreItemsAvailable: Boolean,
+                                             query: String,
+                                             pageSize: Int,
+                                             page: Int) {
+        logger.d(TAG, "loadGitHubReposList(): resetMoreItemsAvailable = $resetMoreItemsAvailable")
+        if (resetMoreItemsAvailable) _noMoreItemsAvailable.postValue(false)
         fetchGitHubReposAndPersist(query, pageSize, page)
     }
 
@@ -246,8 +250,6 @@ class AppRepositoryImpl(
      */
     private fun persistDownloadedGitHubReposList(gitHubRepoEntityList: List<GitHubRepoEntity>) {
 
-        logger.d(TAG,"persistDownloadedGitHubReposList(): gitHubRepoEntityList.size: ${gitHubRepoEntityList.size}")
-
         try {
 
             if (gitHubRepoEntityList.size < AppRepository.NETWORK_PAGE_SIZE) {
@@ -255,6 +257,8 @@ class AppRepositoryImpl(
             } else {
                 _noMoreItemsAvailable.postValue(false)
             }
+
+            logger.d(TAG,"persistDownloadedGitHubReposList(): gitHubRepoEntityList.size: ${gitHubRepoEntityList.size}")
 
             if (gitHubRepoEntityList.isNotEmpty()) {
                 gitHubRepoEntityDao.insertList(gitHubRepoEntityList)
