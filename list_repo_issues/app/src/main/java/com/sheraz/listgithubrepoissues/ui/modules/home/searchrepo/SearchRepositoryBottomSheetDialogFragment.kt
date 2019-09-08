@@ -12,22 +12,26 @@ import androidx.paging.PagedList
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.snackbar.Snackbar
-import com.sheraz.core.data.sharedprefs.AppSharedPrefs
-import com.sheraz.core.data.sharedprefs.getGitHubRepoName
-import com.sheraz.core.data.sharedprefs.getGitHubRepoOwner
+import com.sheraz.core.data.sharedprefs.*
+import com.sheraz.listgithubrepoissues.BR
 import com.sheraz.listgithubrepoissues.R
 import com.sheraz.listgithubrepoissues.databinding.FragmentSearchRepositoryBottomSheetBinding
 import com.sheraz.listgithubrepoissues.di.Injector
 import com.sheraz.listgithubrepoissues.extensions.bindViewModel
 import com.sheraz.listgithubrepoissues.ui.models.GitHubRepoItem
 import com.sheraz.listgithubrepoissues.ui.modules.adapters.SearchRepositoryAdapter
+import com.sheraz.listgithubrepoissues.utils.hideKeyboard
 import com.sheraz.listgithubrepoissues.utils.setWhiteNavigationBar
+import com.sheraz.listgithubrepoissues.utils.showKeyboard
 import kotlinx.android.synthetic.main.fragment_search_repository_bottom_sheet.*
 
 
 class SearchRepositoryBottomSheetDialogFragment: BottomSheetDialogFragment(), DialogInterface.OnShowListener {
 
     private lateinit var fragmentSearchRepositoryBottomSheetBinding: FragmentSearchRepositoryBottomSheetBinding
+
+    private var ownerName = ""
+    private var repoName = ""
 
     private val logger = Injector.getCoreComponent().logger()
     private val appSharedPrefs: AppSharedPrefs
@@ -76,6 +80,9 @@ class SearchRepositoryBottomSheetDialogFragment: BottomSheetDialogFragment(), Di
             DataBindingUtil.inflate(
                 inflater, R.layout.fragment_search_repository_bottom_sheet, container, false)
 
+        fragmentSearchRepositoryBottomSheetBinding.setVariable(BR.searchRepoViewModel, searchRepoViewModel)
+        fragmentSearchRepositoryBottomSheetBinding.executePendingBindings()
+
         return fragmentSearchRepositoryBottomSheetBinding.root
 
     }
@@ -88,10 +95,19 @@ class SearchRepositoryBottomSheetDialogFragment: BottomSheetDialogFragment(), Di
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 
         logger.d(TAG, "onViewCreated(): ")
-
         super.onViewCreated(view, savedInstanceState)
+
+        initData()
         initUI()
         setUpListeners()
+
+    }
+
+    private fun initData() {
+
+        ownerName = appSharedPrefs.getGitHubRepoOwner()
+        repoName = appSharedPrefs.getGitHubRepoName()
+        logger.d(TAG, "initData(): ownerName: $ownerName, repoName: $repoName")
 
     }
 
@@ -114,7 +130,10 @@ class SearchRepositoryBottomSheetDialogFragment: BottomSheetDialogFragment(), Di
             logger.d(TAG, "ibSearchDevicesAction.onClick(): ")
             llSearchContainer.visibility = View.VISIBLE
             flHeaderTextContainer.visibility = View.GONE
-//            KeyboardOp.show(context!!, etSearchRepo)
+            etSearchRepo.setText(
+                appSharedPrefs.get(AppSharedPrefs.GITHUB_REPO_SEARCH_QUERY_KEY,
+                    AppSharedPrefs.DEFAULT_GITHUB_REPO_SEARCH_QUERY))
+            showKeyboard(context!!, etSearchRepo)
         }
 
         ibSearchBackAction.setOnClickListener {
@@ -122,18 +141,18 @@ class SearchRepositoryBottomSheetDialogFragment: BottomSheetDialogFragment(), Di
             etSearchRepo.setText("")
             llSearchContainer.visibility = View.GONE
             flHeaderTextContainer.visibility = View.VISIBLE
-//            KeyboardOp.hide(context!!, etSearchRepo)
+            hideKeyboard(context!!, etSearchRepo)
         }
 
         etSearchRepo.setOnEditorActionListener { v, actionId, _ ->
             if(actionId == EditorInfo.IME_ACTION_DONE){
 
                 if (v.text.toString().trim().isNotEmpty()) {
-                    handleClearCache()
+                    handleClearSearchCache()
 
-                    val searchQuery = v.text.toString().toLowerCase().trim() + "+in:name,description"
+                    val searchQuery = v.text.toString().toLowerCase().trim().also { appSharedPrefs.setSearchQuery(it) }
                     logger.i(TAG, "etSearchRepo.onActionDone(): searchQuery: $searchQuery")
-                    searchRepoViewModel.search(searchQuery)
+//                    searchRepoViewModel.search()
                 }
 
             }
@@ -150,8 +169,8 @@ class SearchRepositoryBottomSheetDialogFragment: BottomSheetDialogFragment(), Di
 
                 searchRepoViewModel.onClearCache()
 
-                appSharedPrefs.set(AppSharedPrefs.SELECTED_GITHUB_REPO_OWNER_KEY, ownerName)
-                appSharedPrefs.set(AppSharedPrefs.SELECTED_GITHUB_REPO_NAME_KEY, repoName)
+                appSharedPrefs.setGitHubRepoOwner(ownerName)
+                appSharedPrefs.setGitHubRepoName(repoName)
 
                 if (onChooseRepositoryListener != null) {
                     onChooseRepositoryListener!!.onChooseRepository()
@@ -166,15 +185,9 @@ class SearchRepositoryBottomSheetDialogFragment: BottomSheetDialogFragment(), Di
 
         logger.d(TAG, "subscribeUi(): ")
 
-        searchRepoViewModel.pagedListLiveData?.observe(this, pagedListObserver)
+        searchRepoViewModel.getLiveDataPagedList().observe(this, pagedListObserver)
         searchRepoViewModel.networkFetchStatusLiveData.observe(this, loadingStatusObserver)
         searchRepoViewModel.networkErrorStatusLiveData.observe(this, networkErrorObserver)
-
-        val ownerName = appSharedPrefs.getGitHubRepoOwner()
-        val repoName = appSharedPrefs.getGitHubRepoName()
-        logger.d(TAG, "subscribeUi(): ownerName: $ownerName, repoName: $repoName")
-
-        searchRepoViewModel.search(ownerName)
 
     }
 
@@ -182,7 +195,7 @@ class SearchRepositoryBottomSheetDialogFragment: BottomSheetDialogFragment(), Di
 
         logger.d(TAG, "unsubscribeUi(): ")
 
-        searchRepoViewModel.pagedListLiveData?.removeObservers(this)
+        searchRepoViewModel.getLiveDataPagedList().removeObservers(this)
         searchRepoViewModel.networkFetchStatusLiveData.removeObservers(this)
         searchRepoViewModel.networkErrorStatusLiveData.removeObservers(this)
 
@@ -204,14 +217,12 @@ class SearchRepositoryBottomSheetDialogFragment: BottomSheetDialogFragment(), Di
         Snackbar.make(fragmentSearchRepositoryBottomSheetBinding.root, exception.message.toString(), Snackbar.LENGTH_LONG).show()
     }
 
-    private fun handleClearCache() {
+    private fun handleClearSearchCache() {
 
-        logger.d(TAG, "handleClearCache(): ")
-        searchRepoViewModel.pagedListLiveData?.removeObservers(this)
-        searchRepoViewModel.onClearCache()
+        logger.d(TAG, "handleClearSearchCache(): ")
+        searchRepoViewModel.onClearReposCache()
         searchRepositoryAdapter.currentList?.dataSource?.invalidate()
         searchRepoViewModel.buildLivePagedList()
-        searchRepoViewModel.pagedListLiveData?.observe(this, pagedListObserver)
 
     }
 

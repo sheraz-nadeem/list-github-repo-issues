@@ -3,6 +3,16 @@
     xmlns:tools="http://schemas.android.com/tools">
 
 
+    <data>
+
+        <import type="android.view.View" />
+
+        <variable
+            name="searchRepoViewModel"
+            type="com.sheraz.listgithubrepoissues.ui.modules.home.searchrepo.SearchRepoViewModel" />
+
+    </data>
+
         <RelativeLayout
             android:id="@+id/llSelectRepoBottomSheetRoot"
             android:layout_width="match_parent"
@@ -78,11 +88,25 @@
 
             </FrameLayout>
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rvGitHubRepo"
+            <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_below="@+id/flHeader"/>
+                android:layout_below="@+id/flHeader">
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rvGitHubRepo"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
+
+                <androidx.core.widget.ContentLoadingProgressBar
+                    android:id="@+id/pbLoading"
+                    style="?android:attr/progressBarStyleLarge"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:visibility="@{searchRepoViewModel.getIsLoading() ? View.VISIBLE : View.GONE}" />
+
+            </FrameLayout>
 
         </RelativeLayout>
 
