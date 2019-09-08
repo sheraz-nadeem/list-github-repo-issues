@@ -25,7 +25,9 @@ class HomeViewModel(
 ): BaseViewModel() {
 
     private val pagedListConfig: PagedList.Config
-    private val _allRepoIssuesPagedFactory = appRepository.getAllRepoIssuesPagedFactory().map { it.toUiModel() }
+    private val _allRepoIssuesPagedFactory = appRepository.getAllRepoIssuesPagedFactory().mapByPage { list -> list.map { it.toUiModel() } }
+
+    private lateinit var liveDataPagedList: LiveData<PagedList<GitHubRepoIssueItem>>
 
     val networkFetchStatusLiveData = appRepository.isFetchInProgress
     val networkErrorStatusLiveData = appRepository.networkError
@@ -44,30 +46,36 @@ class HomeViewModel(
                 .setEnablePlaceholders(false)
                 .build()
 
+        buildLivePagedList()
     }
 
-    fun loadData(ownerName: String, repoName: String, pageSize: Int = AppRepository.NETWORK_PAGE_SIZE, page: Int = 1) {
+    fun loadData(doResetNoMoreItemsAvailable: Boolean = false, pageSize: Int = AppRepository.NETWORK_PAGE_SIZE, page: Int = 1) {
         scope.launch(dispatcherProvider.ioDispatcher) {
-            appRepository.loadGitHubRepoIssuesList(ownerName, repoName, pageSize, page)
+
+            val ownerName = appSharedPrefs.getGitHubRepoOwner()
+            val repoName = appSharedPrefs.getGitHubRepoName()
+            logger.i(TAG, "loadData(): ownerName: $ownerName, repoName: $repoName")
+
+            appRepository.loadGitHubRepoIssuesList(doResetNoMoreItemsAvailable, ownerName, repoName, pageSize, page)
+
         }
     }
 
-    fun onRefresh(ownerName: String, repoName: String, pageSize: Int = AppRepository.NETWORK_PAGE_SIZE, page: Int = -1) =
-        scope.launch(dispatcherProvider.ioDispatcher) {
-            appRepository.loadGitHubRepoIssuesList(ownerName, repoName, pageSize, page)
-        }
+    fun buildLivePagedList() {
+        logger.d(TAG, "buildLivePagedList(): ")
+        liveDataPagedList = LivePagedListBuilder(_allRepoIssuesPagedFactory, pagedListConfig)
+            .setBoundaryCallback(GitHubRepoIssuesBoundaryCallback())
+            .build()
+    }
+
+    fun getLiveDataPagedList() = liveDataPagedList
+
+    fun onRefresh() = liveDataPagedList.value?.dataSource?.invalidate()
 
     fun onClearCache() = scope.launch(dispatcherProvider.ioDispatcher) {
         logger.d(TAG, "onClearCache(): ")
         async { appRepository.clearRepoIssuesCache() }.await()
         async { appRepository.clearReposCache() }.await()
-    }
-
-    fun buildLivePagedList(): LiveData<PagedList<GitHubRepoIssueItem>> {
-        logger.d(TAG, "buildLivePagedList(): ")
-        return LivePagedListBuilder(_allRepoIssuesPagedFactory, pagedListConfig)
-            .setBoundaryCallback(GitHubRepoIssuesBoundaryCallback())
-            .build()
     }
 
     override fun onCleared() {
@@ -79,17 +87,19 @@ class HomeViewModel(
 
     inner class GitHubRepoIssuesBoundaryCallback: BaseBoundaryCallback<GitHubRepoIssueItem>(logger, appRepository) {
 
-        override fun requestData(isLastItem: Boolean) = when (appRepository.isFetchInProgress.value!!) {
+        override fun requestData(isLastItem: Boolean, doResetNoMoreItemsAvailable: Boolean) = when (appRepository.isFetchInProgress.value!!) {
 
-            true -> logger.v(TAG_REPO_BOUNDARY_CALLBACK, "requestData(): isLastItem = $isLastItem, NETWORK FETCH is already in progress")
+            true -> logger.v(TAG_REPO_BOUNDARY_CALLBACK, "requestData(): " +
+                    "isLastItem = $isLastItem, doResetNoMoreItemsAvailable = $doResetNoMoreItemsAvailable, NETWORK FETCH is already in progress")
             false -> {
 
                 val ownerName = appSharedPrefs.getGitHubRepoOwner()
                 val repoName = appSharedPrefs.getGitHubRepoName()
 
-                logger.i(TAG_REPO_BOUNDARY_CALLBACK, "requestData(): isLastItem = $isLastItem, ownerName: $ownerName, repoName: $repoName")
+                logger.i(TAG_REPO_BOUNDARY_CALLBACK, "requestData(): " +
+                        "isLastItem = $isLastItem, doResetNoMoreItemsAvailable = $doResetNoMoreItemsAvailable, ownerName: $ownerName, repoName: $repoName")
 
-                loadData(ownerName, repoName)
+                loadData(doResetNoMoreItemsAvailable)
 
             }
         }

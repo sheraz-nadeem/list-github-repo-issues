@@ -4,10 +4,13 @@ import androidx.lifecycle.LiveData
 import androidx.paging.LivePagedListBuilder
 import androidx.paging.PagedList
 import com.sheraz.core.data.repository.AppRepository
+import com.sheraz.core.data.sharedprefs.AppSharedPrefs
+import com.sheraz.core.data.sharedprefs.getSearchQuery
 import com.sheraz.listgithubrepoissues.extensions.toUiModel
 import com.sheraz.listgithubrepoissues.ui.models.GitHubRepoItem
 import com.sheraz.listgithubrepoissues.ui.modules.base.BaseBoundaryCallback
 import com.sheraz.listgithubrepoissues.ui.modules.base.BaseViewModel
+import com.sheraz.listgithubrepoissues.ui.modules.home.HomeViewModel
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 
@@ -18,17 +21,19 @@ import kotlinx.coroutines.launch
  */
 
 class SearchRepoViewModel(
-    private val appRepository: AppRepository
+    private val appRepository: AppRepository,
+    private val appSharedPrefs: AppSharedPrefs
 ): BaseViewModel() {
 
     private val pagedListConfig: PagedList.Config
     private val _allReposPagedFactory = appRepository.getAllReposPagedFactory().map { it.toUiModel() }
 
+    private lateinit var liveDataPagedList: LiveData<PagedList<GitHubRepoItem>>
+
     val networkFetchStatusLiveData = appRepository.isFetchInProgress
     val networkErrorStatusLiveData = appRepository.networkError
 
-    var pagedListLiveData: LiveData<PagedList<GitHubRepoItem>>? = null
-    var lastSearchQuery = ""
+    var lastSearchQuery = appSharedPrefs.getSearchQuery()
 
     init {
 
@@ -47,28 +52,31 @@ class SearchRepoViewModel(
         buildLivePagedList()
     }
 
-    fun search(query: String, pageSize: Int = AppRepository.NETWORK_PAGE_SIZE, page: Int = 1) {
+    fun search(doResetNoMoreItemsAvailable: Boolean = false, pageSize: Int = AppRepository.NETWORK_PAGE_SIZE, page: Int = 1) {
         scope.launch(dispatcherProvider.ioDispatcher) {
-            lastSearchQuery = query
-            appRepository.loadGitHubReposList(query, pageSize, page)
+            lastSearchQuery = appSharedPrefs.getSearchQuery()
+            logger.i(TAG, "search(): lastSearchQuery: $lastSearchQuery")
+            appRepository.loadGitHubReposList(doResetNoMoreItemsAvailable, lastSearchQuery, pageSize, page)
         }
     }
 
-    fun onRefresh(query: String, pageSize: Int = AppRepository.NETWORK_PAGE_SIZE, page: Int = -1) =
-        scope.launch(dispatcherProvider.ioDispatcher) {
-            appRepository.loadGitHubReposList(query, pageSize, page)
-        }
+    fun buildLivePagedList() {
+        liveDataPagedList = LivePagedListBuilder(_allReposPagedFactory, pagedListConfig)
+            .setBoundaryCallback(GitHubRepoBoundaryCallback())
+            .build()
+    }
+
+    fun getLiveDataPagedList() = liveDataPagedList
+
+    fun onRefresh() = liveDataPagedList.value?.dataSource?.invalidate()
+
+    fun onClearReposCache() = scope.launch(dispatcherProvider.ioDispatcher) { appRepository.clearReposCache() }
 
     fun onClearCache() = scope.launch(dispatcherProvider.ioDispatcher) {
         async { appRepository.clearRepoIssuesCache() }.await()
         async { appRepository.clearReposCache() }.await()
     }
 
-    fun buildLivePagedList() {
-        pagedListLiveData = LivePagedListBuilder(_allReposPagedFactory, pagedListConfig)
-            .setBoundaryCallback(GitHubRepoBoundaryCallback())
-            .build()
-    }
 
     override fun onCleared() {
 
@@ -79,12 +87,14 @@ class SearchRepoViewModel(
 
     inner class GitHubRepoBoundaryCallback: BaseBoundaryCallback<GitHubRepoItem>(logger, appRepository) {
 
-        override fun requestData(isLastItem: Boolean) = when (appRepository.isFetchInProgress.value!!) {
+        override fun requestData(isLastItem: Boolean, doResetNoMoreItemsAvailable: Boolean) = when (appRepository.isFetchInProgress.value!!) {
 
-            true -> logger.v(TAG_REPO_BOUNDARY_CALLBACK, "requestData(): isLastItem = $isLastItem, NETWORK FETCH is already in progress")
+            true -> logger.v(TAG_REPO_BOUNDARY_CALLBACK, "requestData(): " +
+                    "isLastItem = $isLastItem, doResetNoMoreItemsAvailable = $doResetNoMoreItemsAvailable, NETWORK FETCH is already in progress")
             false -> {
-                logger.d(TAG_REPO_BOUNDARY_CALLBACK, "requestData(): isLastItem = $isLastItem, lastSearchQuery: $lastSearchQuery")
-                search(lastSearchQuery)
+                logger.d(TAG_REPO_BOUNDARY_CALLBACK, "requestData(): " +
+                        "isLastItem = $isLastItem, doResetNoMoreItemsAvailable = $doResetNoMoreItemsAvailable, lastSearchQuery: $lastSearchQuery")
+                search(doResetNoMoreItemsAvailable)
             }
         }
 

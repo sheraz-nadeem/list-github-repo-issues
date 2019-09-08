@@ -3,6 +3,7 @@ package com.sheraz.listgithubrepoissues.ui.modules.home.searchrepo
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.sheraz.core.data.repository.AppRepository
+import com.sheraz.core.data.sharedprefs.AppSharedPrefs
 import com.sheraz.core.utils.Logger
 
 /**
@@ -11,7 +12,8 @@ import com.sheraz.core.utils.Logger
 
 class SearchRepoViewModelFactory(
     private val logger: Logger,
-    private val appRepository: AppRepository
+    private val appRepository: AppRepository,
+    private val appSharedPrefs: AppSharedPrefs
 ): ViewModelProvider.Factory {
 
     init {
@@ -26,7 +28,7 @@ class SearchRepoViewModelFactory(
         if (modelClass != SearchRepoViewModel::class.java) {
             throw IllegalArgumentException("Unknown ViewModel class")
         }
-        return SearchRepoViewModel(appRepository) as T
+        return SearchRepoViewModel(appRepository, appSharedPrefs) as T
 
     }
 

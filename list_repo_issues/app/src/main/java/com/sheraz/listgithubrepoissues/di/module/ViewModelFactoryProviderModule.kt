@@ -22,8 +22,8 @@ class ViewModelFactoryProviderModule {
     }
 
     @Provides
-    fun provideSearchRepoViewModelFactory(logger: Logger, appRepository: AppRepository): SearchRepoViewModelFactory {
-        return SearchRepoViewModelFactory(logger, appRepository)
+    fun provideSearchRepoViewModelFactory(logger: Logger, appRepository: AppRepository, appSharedPrefs: AppSharedPrefs): SearchRepoViewModelFactory {
+        return SearchRepoViewModelFactory(logger, appRepository, appSharedPrefs)
     }
 
 }

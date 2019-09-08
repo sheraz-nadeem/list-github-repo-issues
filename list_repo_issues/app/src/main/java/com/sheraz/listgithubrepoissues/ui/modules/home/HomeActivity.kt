@@ -119,8 +119,7 @@ class HomeActivity : BaseActivityToolbar<ActivityHomeBinding, HomeViewModel>(), 
 
         logger.d(TAG, "subscribeUi(): ")
 
-        if (!isActivityRecreated) pagedListLiveData = homeViewModel.buildLivePagedList()
-        pagedListLiveData.observe(this, pagedListObserver)
+        homeViewModel.getLiveDataPagedList().observe(this, pagedListObserver)
         homeViewModel.networkFetchStatusLiveData.observe(this, loadingStatusObserver)
         homeViewModel.networkErrorStatusLiveData.observe(this, networkErrorObserver)
 
@@ -130,7 +129,7 @@ class HomeActivity : BaseActivityToolbar<ActivityHomeBinding, HomeViewModel>(), 
 
         logger.d(TAG, "unsubscribeUi(): ")
 
-        pagedListLiveData.removeObservers(this)
+        homeViewModel.getLiveDataPagedList().removeObservers(this)
         homeViewModel.networkFetchStatusLiveData.removeObservers(this)
         homeViewModel.networkErrorStatusLiveData.removeObservers(this)
 
@@ -147,13 +146,6 @@ class HomeActivity : BaseActivityToolbar<ActivityHomeBinding, HomeViewModel>(), 
             R.id.searchRepoMenuItem -> handleSearchRepo()
         }
         return super.onOptionsItemSelected(item)
-    }
-
-    private fun loadData() {
-
-        logger.d(TAG, "loadData(): ownerName: $ownerName, repoName: $repoName")
-        homeViewModel.loadData(ownerName, repoName)
-
     }
 
     private fun submitList(pagedList: PagedList<GitHubRepoIssueItem>?, isRefreshing: Boolean) {
@@ -184,9 +176,10 @@ class HomeActivity : BaseActivityToolbar<ActivityHomeBinding, HomeViewModel>(), 
         logger.e(TAG, "handleNetworkError(): exception: $exception")
         swipeRefreshLayout.isRefreshing = false
         val snackbar = Snackbar.make(activityHomeBinding?.root!!, exception.message.toString(), Snackbar.LENGTH_LONG)
-        snackbar.setAction("Retry") { loadData() }
+        snackbar.setAction("Retry") { homeViewModel.loadData() }
 
-        if (homeAdapter.currentList?.isEmpty()!!) {
+        val isEmptyList = homeAdapter.currentList?.isEmpty() ?: true
+        if (isEmptyList) {
             llNoData.visibility = View.VISIBLE
         }
 
@@ -195,7 +188,7 @@ class HomeActivity : BaseActivityToolbar<ActivityHomeBinding, HomeViewModel>(), 
     private fun setUpListeners() {
 
         logger.d(TAG, "setUpListeners(): ")
-        swipeRefreshLayout.setOnRefreshListener { homeViewModel.onRefresh(ownerName, repoName) }
+        swipeRefreshLayout.setOnRefreshListener { homeViewModel.onRefresh() }
 
         homeAdapter.setListener(View.OnClickListener {
             if (it.tag != null) {
@@ -207,18 +200,8 @@ class HomeActivity : BaseActivityToolbar<ActivityHomeBinding, HomeViewModel>(), 
     private fun handleClearCache() {
 
         logger.d(TAG, "handleClearCache(): ")
-
         homeViewModel.onClearCache()
-
-//        homeViewModel.pagedListLiveData?.removeObservers(this)
-//        logger.v(TAG, "handleClearCache(): pagedListLiveData.hasObservers = ${homeViewModel.pagedListLiveData?.hasObservers()}, \n" +
-//                "pagedListLiveData.hasActiveObservers = ${homeViewModel.pagedListLiveData?.hasActiveObservers()}")
-
         homeAdapter.currentList?.dataSource?.invalidate()
-//        homeViewModel.buildLivePagedList()
-//        homeViewModel.pagedListLiveData?.observe(this, pagedListObserver)
-//        logger.v(TAG, "handleClearCache(): pagedListLiveData.hasObservers = ${homeViewModel.pagedListLiveData?.hasObservers()}, \n" +
-//                "pagedListLiveData.hasActiveObservers = ${homeViewModel.pagedListLiveData?.hasActiveObservers()}")
     }
 
     private fun handleSearchRepo() {
@@ -259,7 +242,6 @@ class HomeActivity : BaseActivityToolbar<ActivityHomeBinding, HomeViewModel>(), 
     override fun onChooseRepository() {
 
         logger.d(TAG, "onChooseRepository(): ")
-        homeAdapter.currentList?.dataSource?.invalidate()
         subscribeUi()
 
     }
