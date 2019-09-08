@@ -28,8 +28,9 @@
                         android:layout_gravity="center"
                         android:gravity="center"
                         android:textColor="@android:color/white"
-                        android:textSize="@dimen/text_size_medium"
-                        tools:text="@string/select_repo_text" />
+                        android:textSize="@dimen/text_size_moderate"
+                        android:text="@string/select_repo_text"
+                        android:textStyle="bold"/>
 
                     <ImageButton
                         android:id="@+id/ibSearchRepoAction"
