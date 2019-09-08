@@ -3,6 +3,8 @@ package com.sheraz.core.data.sharedprefs
 import android.content.SharedPreferences
 import com.sheraz.core.data.sharedprefs.AppSharedPrefs.Companion.DEFAULT_GITHUB_REPO_NAME
 import com.sheraz.core.data.sharedprefs.AppSharedPrefs.Companion.DEFAULT_GITHUB_REPO_OWNER
+import com.sheraz.core.data.sharedprefs.AppSharedPrefs.Companion.DEFAULT_GITHUB_REPO_SEARCH_QUERY
+import com.sheraz.core.data.sharedprefs.AppSharedPrefs.Companion.GITHUB_REPO_SEARCH_QUERY_KEY
 import com.sheraz.core.data.sharedprefs.AppSharedPrefs.Companion.SELECTED_GITHUB_REPO_NAME_KEY
 import com.sheraz.core.data.sharedprefs.AppSharedPrefs.Companion.SELECTED_GITHUB_REPO_OWNER_KEY
 import javax.inject.Inject
@@ -23,15 +25,21 @@ fun SharedPreferences.clearPrefs() = edit().clear().apply()
  * Extension functions for [AppSharedPrefs] class
  */
 
-fun AppSharedPrefs.getGitHubRepoOwner() = this.get(SELECTED_GITHUB_REPO_OWNER_KEY, DEFAULT_GITHUB_REPO_OWNER) ?: DEFAULT_GITHUB_REPO_OWNER
-fun AppSharedPrefs.getGitHubRepoName() = this.get(SELECTED_GITHUB_REPO_NAME_KEY, DEFAULT_GITHUB_REPO_NAME) ?: DEFAULT_GITHUB_REPO_NAME
+fun AppSharedPrefs.getGitHubRepoOwner() = this.get(SELECTED_GITHUB_REPO_OWNER_KEY, DEFAULT_GITHUB_REPO_OWNER)
+fun AppSharedPrefs.setGitHubRepoOwner(ownerName: String) = this.set(SELECTED_GITHUB_REPO_OWNER_KEY, ownerName)
+
+fun AppSharedPrefs.getGitHubRepoName() = this.get(SELECTED_GITHUB_REPO_NAME_KEY, DEFAULT_GITHUB_REPO_NAME)
+fun AppSharedPrefs.setGitHubRepoName(repoName: String) = this.set(SELECTED_GITHUB_REPO_NAME_KEY, repoName)
+
+fun AppSharedPrefs.getSearchQuery() = this.get(GITHUB_REPO_SEARCH_QUERY_KEY, DEFAULT_GITHUB_REPO_SEARCH_QUERY) + "+in:name,description"
+fun AppSharedPrefs.setSearchQuery(query: String) = this.set(GITHUB_REPO_SEARCH_QUERY_KEY, query)
 
 
 class AppSharedPrefs @Inject constructor(private val sharedPreferences: SharedPreferences) {
 
     fun clearPrefsCache(): Unit = sharedPreferences.clearPrefs()
 
-    fun get(valueKey: String, valueDefault: String): String? = sharedPreferences.getString(valueKey, valueDefault)
+    fun get(valueKey: String, valueDefault: String): String = sharedPreferences.getString(valueKey, valueDefault)!!
 
     fun set(valueKey: String, value: String): Unit = sharedPreferences.saveString(valueKey, value)
 
@@ -64,9 +72,12 @@ class AppSharedPrefs @Inject constructor(private val sharedPreferences: SharedPr
             }
         }
 
-        const val SELECTED_GITHUB_REPO_OWNER_KEY = "selected_github_repo_owner"
-        const val SELECTED_GITHUB_REPO_NAME_KEY = "selected_github_repo_name"
+        const val SELECTED_GITHUB_REPO_OWNER_KEY = "selected_github_repo_owner_key"
+        const val SELECTED_GITHUB_REPO_NAME_KEY = "selected_github_repo_name_key"
         const val DEFAULT_GITHUB_REPO_OWNER = "tensorflow"
         const val DEFAULT_GITHUB_REPO_NAME = "ecosystem"
+
+        const val GITHUB_REPO_SEARCH_QUERY_KEY = "github_repo_search_query_key"
+        const val DEFAULT_GITHUB_REPO_SEARCH_QUERY = "tensorflow"
     }
 }
