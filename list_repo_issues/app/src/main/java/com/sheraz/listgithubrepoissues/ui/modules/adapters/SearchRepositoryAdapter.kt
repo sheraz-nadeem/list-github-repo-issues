@@ -56,7 +56,7 @@ class SearchRepositoryAdapter(
 
         private fun setUpViews(gitHubRepoItem: GitHubRepoItem?) {
 
-            logger.d(TAG, "setUpViews: position: $adapterPosition, repoFullName: ${gitHubRepoItem?.fullName}, description: ${gitHubRepoItem?.description}")
+            logger.d(TAG, "setUpViews: position: $adapterPosition, id: ${gitHubRepoItem?.id}, repoId: ${gitHubRepoItem?.repoId}, repoFullName: ${gitHubRepoItem?.fullName}, description: ${gitHubRepoItem?.description}")
 
             mPicasso.load(gitHubRepoItem?.ownerAvatarUrl)
                 .noFade()
