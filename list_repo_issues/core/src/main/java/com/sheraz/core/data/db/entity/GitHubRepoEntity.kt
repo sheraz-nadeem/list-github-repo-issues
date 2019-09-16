@@ -47,6 +47,9 @@ data class GitHubRepoEntity(
     @ColumnInfo(name = "fork")
     val fork: Boolean,
 
+    @ColumnInfo(name = "score")
+    val score: Float,
+
     @ColumnInfo(name = "watchers")
     val watchers: Int,
 
