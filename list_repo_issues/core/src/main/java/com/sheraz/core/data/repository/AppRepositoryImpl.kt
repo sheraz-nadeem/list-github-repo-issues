@@ -2,6 +2,7 @@ package com.sheraz.core.data.repository
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.sheraz.core.data.db.GitHubRepoEntityDataSourceFactory
 import com.sheraz.core.data.db.dao.GitHubRepoEntityDao
 import com.sheraz.core.data.db.dao.GitHubRepoIssueEntityDao
 import com.sheraz.core.data.db.entity.GitHubRepoEntity
@@ -22,6 +23,7 @@ class AppRepositoryImpl(
     private val logger: Logger,
     private val gitHubRepoIssueEntityDao: GitHubRepoIssueEntityDao,
     private val gitHubRepoEntityDao: GitHubRepoEntityDao,
+    private val gitHubRepoEntityDataSourceFactory: GitHubRepoEntityDataSourceFactory,
     private val gitHubNetworkDataSource: GitHubNetworkDataSource
 ): AppRepository {
 
@@ -40,10 +42,16 @@ class AppRepositoryImpl(
 
     init {
         logger.d(TAG, "init(): ")
+        gitHubRepoEntityDataSourceFactory.create()
+    }
+
+    override fun resetNoMoreItemsAvailable() {
+        logger.d(TAG, "resetNoMoreItemsAvailable(): ")
+        _noMoreItemsAvailable.postValue(false)
     }
 
     override fun getAllRepoIssuesPagedFactory() = gitHubRepoIssueEntityDao.getAllRepoIssuesPaged()
-    override fun getAllReposPagedFactory() = gitHubRepoEntityDao.getAllReposPaged()
+    override fun getAllReposPagedFactory(repoName: String) = gitHubRepoEntityDataSourceFactory.setRepoName(repoName).getDataSourceFactory()
 
     /**
      * Method to return all issues live data
@@ -161,10 +169,10 @@ class AppRepositoryImpl(
 
         _isFetchInProgress.postValue(true)
         val numOfRows = getNumOfRowsIssueEntity()
-        val actualPageSize = getActualPageSize(page, numOfRows)
-        logger.i(TAG,"fetchRepoIssuesFromNetworkAndPersist(): numOfRows: $numOfRows, actualPageSize: $actualPageSize")
+        val actualPage = getActualPage(page, numOfRows)
+        logger.i(TAG,"fetchRepoIssuesFromNetworkAndPersist(): numOfRows: $numOfRows, actualPage: $actualPage")
 
-        return gitHubNetworkDataSource.loadRepoIssuesFromNetwork(ownerName, repoName, pageSize, actualPageSize)
+        return gitHubNetworkDataSource.loadRepoIssuesFromNetwork(ownerName, repoName, pageSize, actualPage)
 
     }
 
@@ -198,12 +206,10 @@ class AppRepositoryImpl(
     /**
      * Method that sends request using [GitHubNetworkDataSource] and also persist data in local cache
      */
-    override suspend fun loadGitHubReposList(resetMoreItemsAvailable: Boolean,
-                                             query: String,
+    override suspend fun loadGitHubReposList(query: String,
                                              pageSize: Int,
                                              page: Int) {
-        logger.d(TAG, "loadGitHubReposList(): resetMoreItemsAvailable = $resetMoreItemsAvailable")
-        if (resetMoreItemsAvailable) _noMoreItemsAvailable.postValue(false)
+        logger.d(TAG, "loadGitHubReposList(): ")
         fetchGitHubReposAndPersist(query, pageSize, page)
     }
 
@@ -211,8 +217,8 @@ class AppRepositoryImpl(
      * Method that initiates network request and also persists data in local cache
      */
     private suspend fun fetchGitHubReposAndPersist(query: String = "",
-                                                        pageSize: Int = AppRepository.NETWORK_PAGE_SIZE,
-                                                        page: Int = 1) {
+                                                   pageSize: Int = AppRepository.NETWORK_PAGE_SIZE,
+                                                   page: Int = 1) {
 
         logger.d(TAG,"fetchGitHubReposAndPersist(): ")
 
@@ -237,11 +243,11 @@ class AppRepositoryImpl(
         logger.d(TAG, "fetchReposFromNetworkAndPersist(): query: $query, pageSize: $pageSize, page: $page")
 
         _isFetchInProgress.postValue(true)
-        val numOfRows = getNumOfRowsRepoEntity()
-        val actualPageSize = getActualPageSize(page, numOfRows)
-        logger.i(TAG,"fetchReposFromNetworkAndPersist(): numOfRows: $numOfRows, actualPageSize: $actualPageSize")
+        val numOfRows = getNumOfRowsRepoEntity(gitHubRepoEntityDataSourceFactory.getQuery())
+        val actualPage = getActualPage(page, numOfRows)
+        logger.i(TAG,"fetchReposFromNetworkAndPersist(): numOfRows: $numOfRows, actualPage: $actualPage")
 
-        return gitHubNetworkDataSource.loadReposFromNetwork(query, pageSize, actualPageSize)
+        return gitHubNetworkDataSource.loadReposFromNetwork(query.plus("+in:name,description"), pageSize, actualPage)
 
     }
 
@@ -273,9 +279,9 @@ class AppRepositoryImpl(
     }
 
     private fun getNumOfRowsIssueEntity() = gitHubRepoIssueEntityDao.getNumOfRows()
-    private fun getNumOfRowsRepoEntity() = gitHubRepoEntityDao.getNumOfRows()
+    private fun getNumOfRowsRepoEntity(query: String) = gitHubRepoEntityDao.getNumOfRowsForQuery(query)
 
-    private fun getActualPageSize(page: Int, numOfRows: Int): Int {
+    private fun getActualPage(page: Int, numOfRows: Int): Int {
         return when (page > 0) {
             true -> (numOfRows / AppRepository.NETWORK_PAGE_SIZE) + 1
             false -> 1 // We need to refresh data
@@ -293,15 +299,18 @@ class AppRepositoryImpl(
         operator fun invoke(logger: Logger,
                             gitHubRepoIssueEntityDao: GitHubRepoIssueEntityDao,
                             gitHubRepoEntityDao: GitHubRepoEntityDao,
+                            gitHubRepoEntityDataSourceFactory: GitHubRepoEntityDataSourceFactory,
                             networkDataSource: GitHubNetworkDataSource): AppRepository = instance ?: synchronized(this) {
-            return@synchronized instance ?: buildAppRepository(logger, gitHubRepoIssueEntityDao, gitHubRepoEntityDao, networkDataSource).also { instance = it }
+            return@synchronized instance ?: buildAppRepository(
+                logger, gitHubRepoIssueEntityDao, gitHubRepoEntityDao, gitHubRepoEntityDataSourceFactory, networkDataSource).also { instance = it }
         }
 
         private fun buildAppRepository(logger: Logger,
                                        gitHubRepoIssueEntityDao: GitHubRepoIssueEntityDao,
                                        gitHubRepoEntityDao: GitHubRepoEntityDao,
+                                       gitHubRepoEntityDataSourceFactory: GitHubRepoEntityDataSourceFactory,
                                        networkDataSource: GitHubNetworkDataSource) =
-            AppRepositoryImpl(logger, gitHubRepoIssueEntityDao, gitHubRepoEntityDao, networkDataSource)
+            AppRepositoryImpl(logger, gitHubRepoIssueEntityDao, gitHubRepoEntityDao, gitHubRepoEntityDataSourceFactory, networkDataSource)
 
     }
 }

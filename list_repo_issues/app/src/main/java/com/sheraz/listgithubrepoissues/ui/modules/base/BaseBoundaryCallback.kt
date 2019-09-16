@@ -15,13 +15,13 @@ abstract class BaseBoundaryCallback<GENERIC_BOUNDARY_CALLBACK_PARCELABLE: Parcel
      * Abstract method that must be implemented by child classes
      * to perform tasks that they need to perform when needed
      */
-    abstract fun requestData(isLastItem: Boolean, doResetNoMoreItemsAvailable: Boolean)
+    abstract fun requestData(isLastItem: Boolean)
 
 
     /**
      * Database returned 0 items. We should query the backend for more items.
      */
-    override fun onZeroItemsLoaded() = requestData(isLastItem = false, doResetNoMoreItemsAvailable = true)
+    override fun onZeroItemsLoaded() = requestData(isLastItem = false)
 
     /**
      * When all items in the database were loaded, we need to query the backend for more items.
@@ -30,8 +30,8 @@ abstract class BaseBoundaryCallback<GENERIC_BOUNDARY_CALLBACK_PARCELABLE: Parcel
         val noMoreItemsAvailable = appRepository.noMoreItemsAvailable.value
         logger.d(TAG, "onItemAtEndLoaded(): noMoreItemsAvailable = ${noMoreItemsAvailable}, itemAtEnd = $itemAtEnd")
         when (noMoreItemsAvailable) {
-            true -> return
-            false -> requestData(isLastItem = true, doResetNoMoreItemsAvailable = false)
+            true -> appRepository.resetNoMoreItemsAvailable()
+            false -> requestData(isLastItem = true)
         }
     }
 

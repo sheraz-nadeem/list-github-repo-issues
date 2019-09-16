@@ -20,8 +20,8 @@ interface GitHubRepoEntityDao {
     @Query("SELECT * FROM github_repo")
     fun getAllRepos(): LiveData<List<GitHubRepoEntity>>
 
-    @Query("SELECT * FROM github_repo")
-    fun getAllReposPaged(): DataSource.Factory<Int, GitHubRepoEntity>
+    @Query("SELECT * FROM github_repo WHERE (name LIKE :queryString) OR (description LIKE :queryString) ORDER BY score DESC, name ASC")
+    fun getAllReposPaged(queryString: String): DataSource.Factory<Int, GitHubRepoEntity>
 
     @Query("SELECT * FROM github_repo WHERE fork = :forked")
     fun getReposByForkedCondition(forked: Boolean = false): LiveData<List<GitHubRepoEntity>>
@@ -29,6 +29,9 @@ interface GitHubRepoEntityDao {
     @Query("DELETE FROM github_repo")
     fun deleteAll(): Int
 
+    @Query("SELECT COUNT(*) FROM github_repo WHERE ((name LIKE :queryString) OR (description LIKE :queryString)) ORDER BY score DESC, name ASC")
+    fun getNumOfRowsForQuery(queryString: String): Int
+
     @Query("SELECT COUNT(*) FROM github_repo")
-    fun getNumOfRows(): Int
+    fun getTotalNumOfRows(): Int
 }

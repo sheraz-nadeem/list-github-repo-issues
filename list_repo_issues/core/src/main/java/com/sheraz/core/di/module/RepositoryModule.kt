@@ -1,5 +1,6 @@
 package com.sheraz.core.di.module
 
+import com.sheraz.core.data.db.GitHubRepoEntityDataSourceFactory
 import com.sheraz.core.data.db.dao.GitHubRepoEntityDao
 import com.sheraz.core.data.db.dao.GitHubRepoIssueEntityDao
 import com.sheraz.core.data.repository.AppRepository
@@ -25,7 +26,14 @@ class RepositoryModule {
         logger: Logger,
         gitHubRepoIssueEntityDao: GitHubRepoIssueEntityDao,
         gitHubRepoEntityDao: GitHubRepoEntityDao,
+        gitHubRepoEntityDataSourceFactory: GitHubRepoEntityDataSourceFactory,
         networkDataSource: GitHubNetworkDataSource
-    ): AppRepository = AppRepositoryImpl.invoke(logger, gitHubRepoIssueEntityDao, gitHubRepoEntityDao, networkDataSource)
+    ): AppRepository = AppRepositoryImpl.invoke(logger, gitHubRepoIssueEntityDao, gitHubRepoEntityDao, gitHubRepoEntityDataSourceFactory, networkDataSource)
+
+    @Provides
+    fun provideGitHubRepoEntityDataSourceFactory(
+        logger: Logger,
+        gitHubRepoEntityDao: GitHubRepoEntityDao
+    ): GitHubRepoEntityDataSourceFactory = GitHubRepoEntityDataSourceFactory(logger, gitHubRepoEntityDao)
 
 }

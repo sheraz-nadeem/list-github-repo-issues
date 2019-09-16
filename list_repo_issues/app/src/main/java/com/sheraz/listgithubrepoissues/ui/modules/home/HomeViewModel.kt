@@ -87,19 +87,19 @@ class HomeViewModel(
 
     inner class GitHubRepoIssuesBoundaryCallback: BaseBoundaryCallback<GitHubRepoIssueItem>(logger, appRepository) {
 
-        override fun requestData(isLastItem: Boolean, doResetNoMoreItemsAvailable: Boolean) = when (appRepository.isFetchInProgress.value!!) {
+        override fun requestData(isLastItem: Boolean) = when (appRepository.isFetchInProgress.value!!) {
 
             true -> logger.v(TAG_REPO_BOUNDARY_CALLBACK, "requestData(): " +
-                    "isLastItem = $isLastItem, doResetNoMoreItemsAvailable = $doResetNoMoreItemsAvailable, NETWORK FETCH is already in progress")
+                    "isLastItem = $isLastItem, NETWORK FETCH is already in progress")
             false -> {
 
                 val ownerName = appSharedPrefs.getGitHubRepoOwner()
                 val repoName = appSharedPrefs.getGitHubRepoName()
 
                 logger.i(TAG_REPO_BOUNDARY_CALLBACK, "requestData(): " +
-                        "isLastItem = $isLastItem, doResetNoMoreItemsAvailable = $doResetNoMoreItemsAvailable, ownerName: $ownerName, repoName: $repoName")
+                        "isLastItem = $isLastItem, ownerName: $ownerName, repoName: $repoName")
 
-                loadData(doResetNoMoreItemsAvailable)
+                loadData()
 
             }
         }

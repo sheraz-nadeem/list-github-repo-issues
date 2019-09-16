@@ -2,6 +2,7 @@ package com.sheraz.core.di.component
 
 import android.content.Context
 import com.sheraz.core.data.db.GitHubRepoDatabase
+import com.sheraz.core.data.db.GitHubRepoEntityDataSourceFactory
 import com.sheraz.core.data.db.dao.GitHubRepoIssueEntityDao
 import com.sheraz.core.data.repository.AppRepository
 import com.sheraz.core.data.sharedprefs.AppSharedPrefs
@@ -34,6 +35,7 @@ interface CoreComponent {
     fun appContext(): Context
     fun database(): GitHubRepoDatabase
     fun gitHubRepoEntityDao(): GitHubRepoIssueEntityDao
+    fun gitHubRepoEntityDataSourceFactory(): GitHubRepoEntityDataSourceFactory
     fun retrofit(): Retrofit
     fun gitHubRepoApiService(): GitHubApiService
     fun gitHubNetworkDataSource(): GitHubNetworkDataSource

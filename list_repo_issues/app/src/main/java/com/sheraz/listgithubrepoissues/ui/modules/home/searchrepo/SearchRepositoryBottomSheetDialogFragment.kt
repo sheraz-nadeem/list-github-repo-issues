@@ -148,11 +148,11 @@ class SearchRepositoryBottomSheetDialogFragment: BottomSheetDialogFragment(), Di
             if(actionId == EditorInfo.IME_ACTION_DONE){
 
                 if (v.text.toString().trim().isNotEmpty()) {
-                    handleClearSearchCache()
+//                    handleClearSearchCache()
 
                     val searchQuery = v.text.toString().toLowerCase().trim().also { appSharedPrefs.setSearchQuery(it) }
                     logger.i(TAG, "etSearchRepo.onActionDone(): searchQuery: $searchQuery")
-//                    searchRepoViewModel.search()
+                    searchRepoViewModel.setSearchQuery(searchQuery)
                 }
 
             }
@@ -185,7 +185,7 @@ class SearchRepositoryBottomSheetDialogFragment: BottomSheetDialogFragment(), Di
 
         logger.d(TAG, "subscribeUi(): ")
 
-        searchRepoViewModel.getLiveDataPagedList().observe(this, pagedListObserver)
+        searchRepoViewModel.liveDataPagedList.observe(this, pagedListObserver)
         searchRepoViewModel.networkFetchStatusLiveData.observe(this, loadingStatusObserver)
         searchRepoViewModel.networkErrorStatusLiveData.observe(this, networkErrorObserver)
 
@@ -195,16 +195,15 @@ class SearchRepositoryBottomSheetDialogFragment: BottomSheetDialogFragment(), Di
 
         logger.d(TAG, "unsubscribeUi(): ")
 
-        searchRepoViewModel.getLiveDataPagedList().removeObservers(this)
+        searchRepoViewModel.liveDataPagedList.removeObservers(this)
         searchRepoViewModel.networkFetchStatusLiveData.removeObservers(this)
         searchRepoViewModel.networkErrorStatusLiveData.removeObservers(this)
 
     }
 
     private fun submitList(pagedList: PagedList<GitHubRepoItem>?, isRefreshing: Boolean) {
-
-        logger.d(TAG, "submitList(): pagedList: ${pagedList?.size}, isRefreshing: $isRefreshing")
         searchRepositoryAdapter.submitList(pagedList)
+        logger.d(TAG, "submitList(): searchRepositoryAdapter.itemCount: ${searchRepositoryAdapter.itemCount}, pagedList: ${pagedList?.size}, isRefreshing: $isRefreshing")
     }
 
     private fun handleFetchInProgress(isFetchInProgress: Boolean) {
@@ -217,14 +216,14 @@ class SearchRepositoryBottomSheetDialogFragment: BottomSheetDialogFragment(), Di
         Snackbar.make(fragmentSearchRepositoryBottomSheetBinding.root, exception.message.toString(), Snackbar.LENGTH_LONG).show()
     }
 
-    private fun handleClearSearchCache() {
-
-        logger.d(TAG, "handleClearSearchCache(): ")
-        searchRepoViewModel.onClearReposCache()
-        searchRepositoryAdapter.currentList?.dataSource?.invalidate()
-        searchRepoViewModel.buildLivePagedList()
-
-    }
+//    private fun handleClearSearchCache() {
+//
+//        logger.d(TAG, "handleClearSearchCache(): ")
+//        searchRepoViewModel.onClearReposCache()
+//        searchRepositoryAdapter.currentList?.dataSource?.invalidate()
+////        searchRepoViewModel.buildLivePagedList()
+//
+//    }
 
     override fun onResume() {
         logger.d(TAG, "onResume(): ")
