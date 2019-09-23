@@ -2,7 +2,7 @@ package com.sheraz.core.data.repository
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.sheraz.core.data.db.GitHubRepoEntityDataSourceFactory
+import com.sheraz.core.data.db.datasourcefactory.GitHubRepoEntityDataSourceFactory
 import com.sheraz.core.data.db.dao.GitHubRepoEntityDao
 import com.sheraz.core.data.db.dao.GitHubRepoIssueEntityDao
 import com.sheraz.core.data.db.entity.GitHubRepoEntity
@@ -51,7 +51,7 @@ class AppRepositoryImpl(
     }
 
     override fun getAllRepoIssuesPagedFactory() = gitHubRepoIssueEntityDao.getAllRepoIssuesPaged()
-    override fun getAllReposPagedFactory(repoName: String) = gitHubRepoEntityDataSourceFactory.setRepoName(repoName).getDataSourceFactory()
+    override fun getAllReposPagedFactory(repoName: String) = gitHubRepoEntityDataSourceFactory.setRepoAndQuery(repoName).getDataSourceFactoryForEntity()
 
     /**
      * Method to return all issues live data
@@ -243,7 +243,7 @@ class AppRepositoryImpl(
         logger.d(TAG, "fetchReposFromNetworkAndPersist(): query: $query, pageSize: $pageSize, page: $page")
 
         _isFetchInProgress.postValue(true)
-        val numOfRows = getNumOfRowsRepoEntity(gitHubRepoEntityDataSourceFactory.getQuery())
+        val numOfRows = getNumOfRowsRepoEntity(gitHubRepoEntityDataSourceFactory.getLikeQueryForEntity())
         val actualPage = getActualPage(page, numOfRows)
         logger.i(TAG,"fetchReposFromNetworkAndPersist(): numOfRows: $numOfRows, actualPage: $actualPage")
 

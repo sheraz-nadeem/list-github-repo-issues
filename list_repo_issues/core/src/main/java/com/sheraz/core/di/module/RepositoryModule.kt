@@ -1,6 +1,6 @@
 package com.sheraz.core.di.module
 
-import com.sheraz.core.data.db.GitHubRepoEntityDataSourceFactory
+import com.sheraz.core.data.db.datasourcefactory.GitHubRepoEntityDataSourceFactory
 import com.sheraz.core.data.db.dao.GitHubRepoEntityDao
 import com.sheraz.core.data.db.dao.GitHubRepoIssueEntityDao
 import com.sheraz.core.data.repository.AppRepository
