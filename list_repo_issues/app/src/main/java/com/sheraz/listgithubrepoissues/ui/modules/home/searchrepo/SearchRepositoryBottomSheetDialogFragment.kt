@@ -167,7 +167,7 @@ class SearchRepositoryBottomSheetDialogFragment: BottomSheetDialogFragment(), Di
                 val repoName = gitHubRepoItem.name
                 logger.d(TAG, "itemSelected(): ownerName: $ownerName, repoName: $repoName")
 
-                searchRepoViewModel.onClearCache()
+//                searchRepoViewModel.onClearCache()
 
                 appSharedPrefs.setGitHubRepoOwner(ownerName)
                 appSharedPrefs.setGitHubRepoName(repoName)
