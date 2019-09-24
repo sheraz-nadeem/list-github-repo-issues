@@ -57,7 +57,7 @@ class HomeAdapter (
                 itemView.tag = gitHubRepoIssueItem
             }
 
-            logger.d(TAG, "setUpViews: position: $adapterPosition, title: ${gitHubRepoIssueItem?.title}, authorAvatarUrl: ${gitHubRepoIssueItem?.authorAvatarUrl}")
+            logger.d(TAG, "setUpViews: position: $adapterPosition, title: ${gitHubRepoIssueItem?.title}, repositoryUrl: ${gitHubRepoIssueItem?.repositoryUrl}")
 
             mPicasso.load(gitHubRepoIssueItem?.authorAvatarUrl)
                 .noFade()

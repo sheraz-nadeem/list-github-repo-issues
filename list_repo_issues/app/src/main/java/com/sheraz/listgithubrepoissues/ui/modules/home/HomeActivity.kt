@@ -119,7 +119,7 @@ class HomeActivity : BaseActivityToolbar<ActivityHomeBinding, HomeViewModel>(), 
 
         logger.d(TAG, "subscribeUi(): ")
 
-        homeViewModel.getLiveDataPagedList().observe(this, pagedListObserver)
+        homeViewModel.liveDataRepoIssuesPagedList.observe(this, pagedListObserver)
         homeViewModel.networkFetchStatusLiveData.observe(this, loadingStatusObserver)
         homeViewModel.networkErrorStatusLiveData.observe(this, networkErrorObserver)
 
@@ -129,7 +129,7 @@ class HomeActivity : BaseActivityToolbar<ActivityHomeBinding, HomeViewModel>(), 
 
         logger.d(TAG, "unsubscribeUi(): ")
 
-        homeViewModel.getLiveDataPagedList().removeObservers(this)
+        homeViewModel.liveDataRepoIssuesPagedList.removeObservers(this)
         homeViewModel.networkFetchStatusLiveData.removeObservers(this)
         homeViewModel.networkErrorStatusLiveData.removeObservers(this)
 
@@ -201,7 +201,6 @@ class HomeActivity : BaseActivityToolbar<ActivityHomeBinding, HomeViewModel>(), 
 
         logger.d(TAG, "handleClearCache(): ")
         homeViewModel.onClearCache()
-        homeAdapter.currentList?.dataSource?.invalidate()
     }
 
     private fun handleSearchRepo() {
@@ -243,6 +242,7 @@ class HomeActivity : BaseActivityToolbar<ActivityHomeBinding, HomeViewModel>(), 
 
         logger.d(TAG, "onChooseRepository(): ")
         subscribeUi()
+        homeViewModel.selectRepo(appSharedPrefs.getGitHubRepoName())
 
     }
 

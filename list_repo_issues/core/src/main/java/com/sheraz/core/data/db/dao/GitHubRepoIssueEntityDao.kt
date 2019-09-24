@@ -23,8 +23,8 @@ interface GitHubRepoIssueEntityDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertList(gitHubRepoEntityList: List<GitHubRepoIssueEntity>)
 
-    @Query("SELECT * FROM github_repo_issue")
-    fun getAllRepoIssuesPaged(): DataSource.Factory<Int, GitHubRepoIssueEntity>
+    @Query("SELECT * FROM github_repo_issue WHERE (repository_url LIKE :queryString) OR (html_url LIKE :queryString) ORDER BY number DESC, title ASC")
+    fun getAllRepoIssuesPaged(queryString: String): DataSource.Factory<Int, GitHubRepoIssueEntity>
 
     @Query("SELECT * FROM github_repo_issue")
     fun getAllRepoIssues(): LiveData<List<GitHubRepoIssueEntity>>
@@ -38,6 +38,9 @@ interface GitHubRepoIssueEntityDao {
     @Query("DELETE FROM github_repo_issue")
     fun deleteAll(): Int
 
+    @Query("SELECT COUNT(*) FROM github_repo_issue WHERE (repository_url LIKE :queryString) OR (html_url LIKE :queryString) ORDER BY number DESC, title ASC")
+    fun getNumOfRowsForQuery(queryString: String): Int
+
     @Query("SELECT COUNT(*) FROM github_repo_issue")
-    fun getNumOfRows(): Int
+    fun getTotalNumOfRows(): Int
 }

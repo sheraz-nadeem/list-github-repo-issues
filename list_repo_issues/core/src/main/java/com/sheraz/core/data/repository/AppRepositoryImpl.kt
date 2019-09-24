@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import com.sheraz.core.data.db.datasourcefactory.GitHubRepoEntityDataSourceFactory
 import com.sheraz.core.data.db.dao.GitHubRepoEntityDao
 import com.sheraz.core.data.db.dao.GitHubRepoIssueEntityDao
+import com.sheraz.core.data.db.datasourcefactory.GitHubRepoIssueDataSourceFactory
 import com.sheraz.core.data.db.entity.GitHubRepoEntity
 import com.sheraz.core.data.db.entity.GitHubRepoIssueEntity
 import com.sheraz.core.network.GitHubNetworkDataSource
@@ -24,6 +25,7 @@ class AppRepositoryImpl(
     private val gitHubRepoIssueEntityDao: GitHubRepoIssueEntityDao,
     private val gitHubRepoEntityDao: GitHubRepoEntityDao,
     private val gitHubRepoEntityDataSourceFactory: GitHubRepoEntityDataSourceFactory,
+    private val gitHubRepoIssueDataSourceFactory: GitHubRepoIssueDataSourceFactory,
     private val gitHubNetworkDataSource: GitHubNetworkDataSource
 ): AppRepository {
 
@@ -50,7 +52,7 @@ class AppRepositoryImpl(
         _noMoreItemsAvailable.postValue(false)
     }
 
-    override fun getAllRepoIssuesPagedFactory() = gitHubRepoIssueEntityDao.getAllRepoIssuesPaged()
+    override fun getAllRepoIssuesPagedFactory(ownerName: String, repoName: String) = gitHubRepoIssueDataSourceFactory.setRepoAndQuery(ownerName, repoName).getDataSourceFactoryForEntity()
     override fun getAllReposPagedFactory(repoName: String) = gitHubRepoEntityDataSourceFactory.setRepoAndQuery(repoName).getDataSourceFactoryForEntity()
 
     /**
@@ -83,6 +85,14 @@ class AppRepositoryImpl(
     override fun getClosedIssuesLiveData(): LiveData<List<GitHubRepoIssueEntity>> {
         logger.d(TAG, "getClosedIssuesLiveData(): ")
         return gitHubRepoIssueEntityDao.getClosedIssuesInRepo()
+    }
+
+    /**
+     * Method to refresh repository issues list
+     */
+    override fun refreshRepoIssuesList() {
+        logger.d(TAG, "refreshRepoIssuesList(): ")
+        gitHubRepoIssueDataSourceFactory.refresh()
     }
 
     /**
@@ -126,13 +136,11 @@ class AppRepositoryImpl(
     /**
      * Method that sends request using [GitHubNetworkDataSource] and also persist data in local cache
      */
-    override suspend fun loadGitHubRepoIssuesList(resetMoreItemsAvailable: Boolean,
-                                                  ownerName: String,
+    override suspend fun loadGitHubRepoIssuesList(ownerName: String,
                                                   repoName: String,
                                                   pageSize: Int,
                                                   page: Int) {
-        logger.d(TAG, "loadGitHubRepoIssuesList(): resetMoreItemsAvailable = $resetMoreItemsAvailable")
-        if (resetMoreItemsAvailable) _noMoreItemsAvailable.postValue(false)
+        logger.d(TAG, "loadGitHubRepoIssuesList(): ")
         fetchGitHubRepoIssuesAndPersist(ownerName, repoName, pageSize, page)
     }
 
@@ -168,7 +176,7 @@ class AppRepositoryImpl(
         logger.d(TAG, "fetchRepoIssuesFromNetworkAndPersist(): ownerName: $ownerName, repoName: $repoName, pageSize: $pageSize, page: $page")
 
         _isFetchInProgress.postValue(true)
-        val numOfRows = getNumOfRowsIssueEntity()
+        val numOfRows = getNumOfRowsIssueEntity(gitHubRepoIssueDataSourceFactory.getLikeQueryForEntity())
         val actualPage = getActualPage(page, numOfRows)
         logger.i(TAG,"fetchRepoIssuesFromNetworkAndPersist(): numOfRows: $numOfRows, actualPage: $actualPage")
 
@@ -278,7 +286,7 @@ class AppRepositoryImpl(
 
     }
 
-    private fun getNumOfRowsIssueEntity() = gitHubRepoIssueEntityDao.getNumOfRows()
+    private fun getNumOfRowsIssueEntity(query: String) = gitHubRepoIssueEntityDao.getNumOfRowsForQuery(query)
     private fun getNumOfRowsRepoEntity(query: String) = gitHubRepoEntityDao.getNumOfRowsForQuery(query)
 
     private fun getActualPage(page: Int, numOfRows: Int): Int {
@@ -300,17 +308,32 @@ class AppRepositoryImpl(
                             gitHubRepoIssueEntityDao: GitHubRepoIssueEntityDao,
                             gitHubRepoEntityDao: GitHubRepoEntityDao,
                             gitHubRepoEntityDataSourceFactory: GitHubRepoEntityDataSourceFactory,
+                            gitHubRepoIssueDataSourceFactory: GitHubRepoIssueDataSourceFactory,
                             networkDataSource: GitHubNetworkDataSource): AppRepository = instance ?: synchronized(this) {
             return@synchronized instance ?: buildAppRepository(
-                logger, gitHubRepoIssueEntityDao, gitHubRepoEntityDao, gitHubRepoEntityDataSourceFactory, networkDataSource).also { instance = it }
+                logger,
+                gitHubRepoIssueEntityDao,
+                gitHubRepoEntityDao,
+                gitHubRepoEntityDataSourceFactory,
+                gitHubRepoIssueDataSourceFactory,
+                networkDataSource
+            ).also { instance = it }
         }
 
         private fun buildAppRepository(logger: Logger,
                                        gitHubRepoIssueEntityDao: GitHubRepoIssueEntityDao,
                                        gitHubRepoEntityDao: GitHubRepoEntityDao,
                                        gitHubRepoEntityDataSourceFactory: GitHubRepoEntityDataSourceFactory,
+                                       gitHubRepoIssueDataSourceFactory: GitHubRepoIssueDataSourceFactory,
                                        networkDataSource: GitHubNetworkDataSource) =
-            AppRepositoryImpl(logger, gitHubRepoIssueEntityDao, gitHubRepoEntityDao, gitHubRepoEntityDataSourceFactory, networkDataSource)
+            AppRepositoryImpl(
+                logger,
+                gitHubRepoIssueEntityDao,
+                gitHubRepoEntityDao,
+                gitHubRepoEntityDataSourceFactory,
+                gitHubRepoIssueDataSourceFactory,
+                networkDataSource
+            )
 
     }
 }

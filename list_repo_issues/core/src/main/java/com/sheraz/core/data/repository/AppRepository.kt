@@ -24,22 +24,26 @@ interface AppRepository {
 
     fun resetNoMoreItemsAvailable()
 
-    fun getAllRepoIssuesPagedFactory(): DataSource.Factory<Int, GitHubRepoIssueEntity>
+    fun getAllRepoIssuesPagedFactory(ownerName: String, repoName: String): DataSource.Factory<Int, GitHubRepoIssueEntity>
     fun getAllReposPagedFactory(repoName: String): DataSource.Factory<Int, GitHubRepoEntity>
 
     fun getAllReposLiveData(): LiveData<List<GitHubRepoEntity>>
     fun getAllRepoIssuesLiveData(): LiveData<List<GitHubRepoIssueEntity>>
     fun getOpenIssuesLiveData(): LiveData<List<GitHubRepoIssueEntity>>
     fun getClosedIssuesLiveData(): LiveData<List<GitHubRepoIssueEntity>>
+    fun refreshRepoIssuesList()
 
     suspend fun clearRepoIssuesCache()
     suspend fun clearReposCache()
-    suspend fun loadGitHubRepoIssuesList(resetMoreItemsAvailable: Boolean = false, ownerName: String = "", repoName: String = "", pageSize: Int = NETWORK_PAGE_SIZE, page: Int = 1)
+    suspend fun loadGitHubRepoIssuesList(
+        ownerName: String = "",
+        repoName: String = "",
+        pageSize: Int = NETWORK_PAGE_SIZE,
+        page: Int = 1)
     suspend fun loadGitHubReposList(
         query: String = "",
         pageSize: Int = NETWORK_PAGE_SIZE,
         page: Int = 1)
-//    suspend fun refreshGitHubRepoIssuesList(ownerName: String, repoName: String)
 
     companion object {
         const val NETWORK_PAGE_SIZE = 50

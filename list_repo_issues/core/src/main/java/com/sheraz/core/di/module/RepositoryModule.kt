@@ -3,6 +3,7 @@ package com.sheraz.core.di.module
 import com.sheraz.core.data.db.datasourcefactory.GitHubRepoEntityDataSourceFactory
 import com.sheraz.core.data.db.dao.GitHubRepoEntityDao
 import com.sheraz.core.data.db.dao.GitHubRepoIssueEntityDao
+import com.sheraz.core.data.db.datasourcefactory.GitHubRepoIssueDataSourceFactory
 import com.sheraz.core.data.repository.AppRepository
 import com.sheraz.core.data.repository.AppRepositoryImpl
 import com.sheraz.core.network.GitHubNetworkDataSource
@@ -27,13 +28,27 @@ class RepositoryModule {
         gitHubRepoIssueEntityDao: GitHubRepoIssueEntityDao,
         gitHubRepoEntityDao: GitHubRepoEntityDao,
         gitHubRepoEntityDataSourceFactory: GitHubRepoEntityDataSourceFactory,
+        gitHubRepoIssueDataSourceFactory: GitHubRepoIssueDataSourceFactory,
         networkDataSource: GitHubNetworkDataSource
-    ): AppRepository = AppRepositoryImpl.invoke(logger, gitHubRepoIssueEntityDao, gitHubRepoEntityDao, gitHubRepoEntityDataSourceFactory, networkDataSource)
+    ): AppRepository = AppRepositoryImpl.invoke(
+        logger,
+        gitHubRepoIssueEntityDao,
+        gitHubRepoEntityDao,
+        gitHubRepoEntityDataSourceFactory,
+        gitHubRepoIssueDataSourceFactory,
+        networkDataSource
+    )
 
     @Provides
     fun provideGitHubRepoEntityDataSourceFactory(
         logger: Logger,
         gitHubRepoEntityDao: GitHubRepoEntityDao
     ): GitHubRepoEntityDataSourceFactory = GitHubRepoEntityDataSourceFactory(logger, gitHubRepoEntityDao)
+
+    @Provides
+    fun provideGitHubRepoIssueDataSourceFactory(
+        logger: Logger,
+        gitHubRepoIssueEntityDao: GitHubRepoIssueEntityDao
+    ): GitHubRepoIssueDataSourceFactory = GitHubRepoIssueDataSourceFactory(logger, gitHubRepoIssueEntityDao)
 
 }

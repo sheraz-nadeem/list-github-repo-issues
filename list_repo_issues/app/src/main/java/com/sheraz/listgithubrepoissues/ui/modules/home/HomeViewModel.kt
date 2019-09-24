@@ -1,6 +1,9 @@
 package com.sheraz.listgithubrepoissues.ui.modules.home
 
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Transformations
+import androidx.paging.DataSource
 import androidx.paging.LivePagedListBuilder
 import androidx.paging.PagedList
 import com.sheraz.core.data.repository.AppRepository
@@ -24,10 +27,23 @@ class HomeViewModel(
     private val appSharedPrefs: AppSharedPrefs
 ): BaseViewModel() {
 
-    private val pagedListConfig: PagedList.Config
-    private val _allRepoIssuesPagedFactory = appRepository.getAllRepoIssuesPagedFactory().mapByPage { list -> list.map { it.toUiModel() } }
+    private val _selectedRepoNameLiveData = MutableLiveData<String>().apply { postValue(appSharedPrefs.getGitHubRepoName()) }
+    private val _selectedRepoLiveData: LiveData<DataSource.Factory<Int, GitHubRepoIssueItem>> = Transformations.map(_selectedRepoNameLiveData) {it ->
+        val ownerName = appSharedPrefs.getGitHubRepoOwner()
+        val repoName = appSharedPrefs.getGitHubRepoName()
+        logger.v(TAG, "_selectedRepoLiveData(): ownerName: $ownerName, repoName: $repoName")
+        appRepository.getAllRepoIssuesPagedFactory(ownerName, repoName).map{ it.toUiModel() }.also { loadData() }
+    }
+    private val _liveDataRepoIssuesPagedList: LiveData<PagedList<GitHubRepoIssueItem>> = Transformations.switchMap(_selectedRepoLiveData) {
+        logger.v(TAG, "_liveDataRepoIssuesPagedList: Building livePagedList")
+        LivePagedListBuilder(it, pagedListConfig)
+            .setBoundaryCallback(GitHubRepoIssuesBoundaryCallback())
+            .build()
+    }
+    val liveDataRepoIssuesPagedList: LiveData<PagedList<GitHubRepoIssueItem>>
+        get() = _liveDataRepoIssuesPagedList
 
-    private lateinit var liveDataPagedList: LiveData<PagedList<GitHubRepoIssueItem>>
+    private val pagedListConfig: PagedList.Config
 
     val networkFetchStatusLiveData = appRepository.isFetchInProgress
     val networkErrorStatusLiveData = appRepository.networkError
@@ -46,31 +62,26 @@ class HomeViewModel(
                 .setEnablePlaceholders(false)
                 .build()
 
-        buildLivePagedList()
     }
 
-    fun loadData(doResetNoMoreItemsAvailable: Boolean = false, pageSize: Int = AppRepository.NETWORK_PAGE_SIZE, page: Int = 1) {
+    fun selectRepo(repoName: String) {
+        logger.i(TAG, "selectRepo(): repoName: $repoName")
+        _selectedRepoNameLiveData.postValue(repoName)
+    }
+
+    fun loadData() {
         scope.launch(dispatcherProvider.ioDispatcher) {
 
             val ownerName = appSharedPrefs.getGitHubRepoOwner()
             val repoName = appSharedPrefs.getGitHubRepoName()
             logger.i(TAG, "loadData(): ownerName: $ownerName, repoName: $repoName")
 
-            appRepository.loadGitHubRepoIssuesList(doResetNoMoreItemsAvailable, ownerName, repoName, pageSize, page)
+            appRepository.loadGitHubRepoIssuesList(ownerName, repoName)
 
         }
     }
 
-    fun buildLivePagedList() {
-        logger.d(TAG, "buildLivePagedList(): ")
-        liveDataPagedList = LivePagedListBuilder(_allRepoIssuesPagedFactory, pagedListConfig)
-            .setBoundaryCallback(GitHubRepoIssuesBoundaryCallback())
-            .build()
-    }
-
-    fun getLiveDataPagedList() = liveDataPagedList
-
-    fun onRefresh() = liveDataPagedList.value?.dataSource?.invalidate()
+    fun onRefresh() = appRepository.refreshRepoIssuesList().also { selectRepo("") }
 
     fun onClearCache() = scope.launch(dispatcherProvider.ioDispatcher) {
         logger.d(TAG, "onClearCache(): ")
