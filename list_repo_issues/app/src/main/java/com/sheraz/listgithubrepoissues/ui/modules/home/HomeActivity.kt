@@ -33,8 +33,6 @@ import kotlinx.android.synthetic.main.activity_home.*
 class HomeActivity : BaseActivityToolbar<ActivityHomeBinding, HomeViewModel>(), SearchRepositoryBottomSheetDialogFragment.OnChooseRepositoryListener {
 
     private var activityHomeBinding: ActivityHomeBinding? = null
-    private lateinit var pagedListLiveData: LiveData<PagedList<GitHubRepoIssueItem>>
-
     private var ownerName = ""
     private var repoName = ""
     private var isActivityRecreated = false
@@ -71,6 +69,7 @@ class HomeActivity : BaseActivityToolbar<ActivityHomeBinding, HomeViewModel>(), 
 
         initData()
         initUI()
+        updateUi()
         setUpListeners()
     }
 
@@ -146,6 +145,14 @@ class HomeActivity : BaseActivityToolbar<ActivityHomeBinding, HomeViewModel>(), 
             R.id.searchRepoMenuItem -> handleSearchRepo()
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    private fun updateUi() {
+
+        logger.d(TAG, "updateUi(): ")
+        tvRepoOwnerName.text = ownerName
+        tvRepoFullName.text = repoName
+
     }
 
     private fun submitList(pagedList: PagedList<GitHubRepoIssueItem>?, isRefreshing: Boolean) {
@@ -243,6 +250,8 @@ class HomeActivity : BaseActivityToolbar<ActivityHomeBinding, HomeViewModel>(), 
         logger.d(TAG, "onChooseRepository(): ")
         subscribeUi()
         homeViewModel.selectRepo(appSharedPrefs.getGitHubRepoName())
+        initData()
+        updateUi()
 
     }
 

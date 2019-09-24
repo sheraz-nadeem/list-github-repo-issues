@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:tools="http://schemas.android.com/tools">
 
     <data>
 
@@ -16,27 +16,90 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <FrameLayout
+        <androidx.coordinatorlayout.widget.CoordinatorLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-            <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-                android:id="@+id/swipeRefreshLayout"
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
+                android:layout_height="match_parent"
+                android:layout_margin="@dimen/dimen_3"
+                android:gravity="center_vertical"
+                android:orientation="vertical">
 
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/rvGitHubRepoIssuesList"
+                <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:paddingStart="@dimen/dimen_5"
-                    android:paddingLeft="@dimen/dimen_5"
-                    android:paddingEnd="@dimen/dimen_5"
-                    android:paddingRight="@dimen/dimen_5"
-                    android:scrollbarStyle="insideOverlay"
-                    android:scrollbars="vertical" />
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:paddingTop="@dimen/dimen_2"
+                    android:paddingBottom="@dimen/dimen_2">
 
-            </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+                    <com.sheraz.core.widgets.TextViewNormal
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Repository Owner"
+                        android:textColor="@color/colorDarkText"
+                        android:textSize="@dimen/text_size_moderate"
+                        android:layout_marginRight="@dimen/dimen_3"
+                        android:layout_marginEnd="@dimen/dimen_3" />
+
+                    <com.sheraz.core.widgets.TextViewArcaHeavy
+                        android:id="@+id/tvRepoOwnerName"
+                        tools:text="Repo Owner Name"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/colorDarkText"
+                        android:textSize="@dimen/text_size_moderate"
+                        android:textStyle="bold" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:paddingTop="@dimen/dimen_2"
+                    android:paddingBottom="@dimen/dimen_2">
+
+                    <com.sheraz.core.widgets.TextViewNormal
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Repository Full Name"
+                        android:textColor="@color/colorDarkText"
+                        android:textSize="@dimen/text_size_moderate"
+                        android:layout_marginRight="@dimen/dimen_3"
+                        android:layout_marginEnd="@dimen/dimen_3" />
+
+                    <com.sheraz.core.widgets.TextViewArcaHeavy
+                        android:id="@+id/tvRepoFullName"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:ellipsize="end"
+                        android:maxLines="3"
+                        android:textColor="@color/colorDarkText"
+                        android:textSize="@dimen/text_size_moderate" />
+
+                </LinearLayout>
+
+                <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+                    android:id="@+id/swipeRefreshLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/rvGitHubRepoIssuesList"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:paddingStart="@dimen/dimen_5"
+                        android:paddingLeft="@dimen/dimen_5"
+                        android:paddingEnd="@dimen/dimen_5"
+                        android:paddingRight="@dimen/dimen_5"
+                        android:scrollbarStyle="insideOverlay"
+                        android:scrollbars="vertical" />
+
+                </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+            </LinearLayout>
 
             <androidx.core.widget.ContentLoadingProgressBar
                 android:id="@+id/pbLoading"
@@ -66,7 +129,7 @@
 
             </LinearLayout>
 
-        </FrameLayout>
+        </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
     </merge>
 
