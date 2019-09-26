@@ -130,9 +130,7 @@ class SearchRepositoryBottomSheetDialogFragment: BottomSheetDialogFragment(), Di
             logger.d(TAG, "ibSearchDevicesAction.onClick(): ")
             llSearchContainer.visibility = View.VISIBLE
             flHeaderTextContainer.visibility = View.GONE
-            etSearchRepo.setText(
-                appSharedPrefs.get(AppSharedPrefs.GITHUB_REPO_SEARCH_QUERY_KEY,
-                    AppSharedPrefs.DEFAULT_GITHUB_REPO_SEARCH_QUERY))
+            etSearchRepo.setText(appSharedPrefs.getSearchQuery())
             showKeyboard(context!!, etSearchRepo)
         }
 

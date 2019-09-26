@@ -8,7 +8,7 @@ import androidx.paging.LivePagedListBuilder
 import androidx.paging.PagedList
 import com.sheraz.core.data.repository.AppRepository
 import com.sheraz.core.data.sharedprefs.AppSharedPrefs
-import com.sheraz.core.data.sharedprefs.getGitHubRepoOwner
+import com.sheraz.core.data.sharedprefs.getSearchQuery
 import com.sheraz.listgithubrepoissues.extensions.toUiModel
 import com.sheraz.listgithubrepoissues.ui.models.GitHubRepoItem
 import com.sheraz.listgithubrepoissues.ui.modules.base.BaseBoundaryCallback
@@ -28,7 +28,7 @@ class SearchRepoViewModel(
 ): BaseViewModel() {
 
 
-    private val _queryLiveData = MutableLiveData<String>().apply { postValue(appSharedPrefs.getGitHubRepoOwner()) }
+    private val _queryLiveData = MutableLiveData<String>().apply { postValue(appSharedPrefs.getSearchQuery()) }
     private val _reposLiveData: LiveData<DataSource.Factory<Int, GitHubRepoItem>> = Transformations.map(_queryLiveData) {query ->
         logger.v(TAG, "_reposLiveData: query = $query")
         appRepository.getAllReposPagedFactory(query).map {it.toUiModel()}.also { search() }
