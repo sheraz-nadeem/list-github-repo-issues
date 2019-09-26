@@ -31,7 +31,7 @@ fun AppSharedPrefs.setGitHubRepoOwner(ownerName: String) = this.set(SELECTED_GIT
 fun AppSharedPrefs.getGitHubRepoName() = this.get(SELECTED_GITHUB_REPO_NAME_KEY, DEFAULT_GITHUB_REPO_NAME)
 fun AppSharedPrefs.setGitHubRepoName(repoName: String) = this.set(SELECTED_GITHUB_REPO_NAME_KEY, repoName)
 
-fun AppSharedPrefs.getSearchQuery() = this.get(GITHUB_REPO_SEARCH_QUERY_KEY, DEFAULT_GITHUB_REPO_SEARCH_QUERY) + "+in:name,description"
+fun AppSharedPrefs.getSearchQuery() = this.get(GITHUB_REPO_SEARCH_QUERY_KEY, DEFAULT_GITHUB_REPO_SEARCH_QUERY)
 fun AppSharedPrefs.setSearchQuery(query: String) = this.set(GITHUB_REPO_SEARCH_QUERY_KEY, query)
 
 
