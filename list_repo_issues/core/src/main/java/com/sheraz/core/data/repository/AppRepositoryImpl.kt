@@ -44,7 +44,6 @@ class AppRepositoryImpl(
 
     init {
         logger.d(TAG, "init(): ")
-        gitHubRepoEntityDataSourceFactory.create()
     }
 
     override fun resetNoMoreItemsAvailable() {
@@ -52,8 +51,10 @@ class AppRepositoryImpl(
         _noMoreItemsAvailable.postValue(false)
     }
 
-    override fun getAllRepoIssuesPagedFactory(ownerName: String, repoName: String) = gitHubRepoIssueDataSourceFactory.setRepoAndQuery(ownerName, repoName).getDataSourceFactoryForEntity()
-    override fun getAllReposPagedFactory(repoName: String) = gitHubRepoEntityDataSourceFactory.setRepoAndQuery(repoName).getDataSourceFactoryForEntity()
+    override fun getAllRepoIssuesPagedFactory(ownerName: String, repoName: String) =
+        gitHubRepoIssueDataSourceFactory.setRepoAndQuery(ownerName, repoName).getDataSourceFactoryForEntity()
+    override fun getAllReposPagedFactory(repoName: String) =
+        gitHubRepoEntityDataSourceFactory.setRepoAndQuery(repoName).getDataSourceFactoryForEntity()
 
     /**
      * Method to return all issues live data
