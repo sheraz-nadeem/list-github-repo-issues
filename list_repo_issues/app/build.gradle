@@ -62,8 +62,4 @@ dependencies {
     // ViewModel & LiveData
     kapt "androidx.lifecycle:lifecycle-compiler:$rootProject.lifecycleVersion"
 
-
-    // Testing Dependencies
-    testImplementation "com.nhaarman.mockitokotlin2:mockito-kotlin:$rootProject.mockitoKotlinVersion"
-    testImplementation "androidx.arch.core:core-testing:$rootProject.archCoreTestingVersion"
 }
