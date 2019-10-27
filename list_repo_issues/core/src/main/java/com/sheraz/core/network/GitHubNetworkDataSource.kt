@@ -20,6 +20,7 @@ interface GitHubNetworkDataSource {
     suspend fun loadReposFromNetwork(query: String, pageSize: Int, page: Int): Result<List<GitHubRepoEntity>>
 
     companion object {
-        const val ERROR_MESSAGE = "Error loading github repos data"
+        const val ERROR_MESSAGE_REPO_ISSUES = "Unable to load github repository issues"
+        const val ERROR_MESSAGE_REPOS = "Unable to load github repositories"
     }
 }

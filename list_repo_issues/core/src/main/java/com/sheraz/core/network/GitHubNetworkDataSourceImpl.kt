@@ -2,6 +2,8 @@ package com.sheraz.core.network
 
 import com.sheraz.core.data.db.entity.GitHubRepoEntity
 import com.sheraz.core.data.db.entity.GitHubRepoIssueEntity
+import com.sheraz.core.network.GitHubNetworkDataSource.Companion.ERROR_MESSAGE_REPOS
+import com.sheraz.core.network.GitHubNetworkDataSource.Companion.ERROR_MESSAGE_REPO_ISSUES
 import com.sheraz.core.network.response.Result
 import com.sheraz.core.utils.Logger
 import com.sheraz.core.utils.safeApiCall
@@ -36,7 +38,7 @@ class GitHubNetworkDataSourceImpl(
                                                    pageSize: Int,
                                                    page: Int) = safeApiCall(
         networkBlock = { fetchRepoIssuesFromNetwork(ownerName, repoName, pageSize, page) },
-        errorMessage = "Unable to load repository issues"
+        errorMessage = ERROR_MESSAGE_REPO_ISSUES
     )
 
     /**
@@ -69,7 +71,7 @@ class GitHubNetworkDataSourceImpl(
 
         }
 
-        return Result.Error(IOException(" Throwing exception ${response.code()} ${response.message()}"))
+        return Result.Error(IOException(ERROR_MESSAGE_REPO_ISSUES))
     }
 
     /**
@@ -87,7 +89,7 @@ class GitHubNetworkDataSourceImpl(
                                                    pageSize: Int,
                                                    page: Int) = safeApiCall(
         networkBlock = { fetchReposFromNetwork(query, pageSize, page) },
-        errorMessage = "Unable to load repository issues"
+        errorMessage = ERROR_MESSAGE_REPOS
     )
 
     /**
@@ -118,7 +120,7 @@ class GitHubNetworkDataSourceImpl(
 
         }
 
-        return Result.Error(IOException(" Throwing exception ${response.code()} ${response.message()}"))
+        return Result.Error(IOException(ERROR_MESSAGE_REPOS))
     }
 
     companion object {
