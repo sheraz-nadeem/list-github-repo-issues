@@ -3,8 +3,10 @@ package com.sheraz.core.network
 import com.sheraz.core.base.BaseTest
 import com.sheraz.core.data.db.entity.GitHubRepoEntity
 import com.sheraz.core.data.db.entity.GitHubRepoIssueEntity
+import com.sheraz.core.network.GitHubNetworkDataSource.Companion.ERROR_MESSAGE_REPOS
 import com.sheraz.core.network.GitHubNetworkDataSource.Companion.ERROR_MESSAGE_REPO_ISSUES
 import com.sheraz.core.network.response.Result
+import com.sheraz.core.network.response.SearchGitHubRepoResponse
 import com.sheraz.core.shared.awesomeTensorflowRepo
 import com.sheraz.core.shared.tensorflowModelsRepo
 import com.sheraz.core.shared.tensorflowModelsRepoIssue1
@@ -27,11 +29,15 @@ import java.io.IOException
 class GitHubNetworkDataSourceTest: BaseTest() {
 
     private val repoList: List<GitHubRepoEntity> = listOf(tensorflowModelsRepo, awesomeTensorflowRepo)
+    private val repoSuccessResponse = Response.success(SearchGitHubRepoResponse(repoList))
+    private val repoSuccessResult = Result.Success(repoList)
+    private val repoFailureResponse = Response.error<SearchGitHubRepoResponse>(400, ResponseBody.create(null, ERROR_MESSAGE_REPOS))
+    private val repoFailureResult = Result.Error(IOException(ERROR_MESSAGE_REPOS))
+
 
     private val repoIssuesList: List<GitHubRepoIssueEntity> = listOf(tensorflowModelsRepoIssue1, tensorflowModelsRepoIssue2)
     private val repoIssuesSuccessResponse = Response.success(repoIssuesList)
     private val repoIssuesSuccessResult = Result.Success(repoIssuesList)
-
     private val repoIssuesFailureResponse = Response.error<List<GitHubRepoIssueEntity>>(400, ResponseBody.create(null, ERROR_MESSAGE_REPO_ISSUES))
     private val repoIssuesFailureResult = Result.Error(IOException(ERROR_MESSAGE_REPO_ISSUES))
 
@@ -46,7 +52,7 @@ class GitHubNetworkDataSourceTest: BaseTest() {
     }
 
     @Test
-    fun `test when load happens then fetch happens only once and response is success`() = runBlocking {
+    fun `test when loading repository issues then fetch happens only once and response is success`() = runBlocking {
 
         val ownerName = "tensorflow"
         val repoName = "model"
@@ -80,7 +86,7 @@ class GitHubNetworkDataSourceTest: BaseTest() {
     }
 
     @Test
-    fun `test when load happens then fetch happens only once and response is failure`() = runBlocking {
+    fun `test when loading repository issues then fetch happens only once and response is failure`() = runBlocking {
 
         val ownerName = "tensorflow"
         val repoName = "model"
@@ -97,6 +103,46 @@ class GitHubNetworkDataSourceTest: BaseTest() {
         // and returns expected result
         verify(exactly = 1) { gitHubApiService.getRepoIssuesAsync(ownerName, repoName, pageSize, page) }
         assertEquals(repoIssuesFailureResult.exception.message, (actualResult as Result.Error).exception.message)
+
+    }
+
+    @Test
+    fun `test when loading repository then fetch happens only once and response is success`() = runBlocking {
+
+        val query = "tensorflow"
+        val page = 1
+        val pageSize = 50
+
+        // Given that api service responds success
+        coEvery { gitHubApiService.searchReposAsync(query, pageSize, page) } returns CompletableDeferred(repoSuccessResponse)
+
+        // When search repository happens
+        val actualResult = networkDataSource.loadReposFromNetwork(query, pageSize, page)
+
+        // Then verify that api service is invoked only once
+        // and return success response
+        verify(exactly = 1) { gitHubApiService.searchReposAsync(query, pageSize, page) }
+        assertEquals(repoSuccessResult, actualResult)
+
+    }
+
+    @Test
+    fun `test when loading repository then fetch happens only once and response is failure`() = runBlocking {
+
+        val query = "tensorflow"
+        val page = 1
+        val pageSize = 50
+
+        // Given that api service responds with failure
+        coEvery { gitHubApiService.searchReposAsync(query, pageSize, page) } returns CompletableDeferred(repoFailureResponse)
+
+        // When search repository happens
+        val actualResult = networkDataSource.loadReposFromNetwork(query, pageSize, page)
+
+        // Then verify that api service is invoked only once
+        // and it returns failure response
+        verify(exactly = 1) { gitHubApiService.searchReposAsync(query, pageSize, page) }
+        assertEquals(repoFailureResult.exception.message, (actualResult as Result.Error).exception.message)
 
     }
 
