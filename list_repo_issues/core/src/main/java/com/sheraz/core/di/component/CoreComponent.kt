@@ -1,6 +1,7 @@
 package com.sheraz.core.di.component
 
 import android.content.Context
+import com.sheraz.core.data.CoroutinesDispatcherProvider
 import com.sheraz.core.data.db.GitHubRepoDatabase
 import com.sheraz.core.data.db.datasourcefactory.GitHubRepoEntityDataSourceFactory
 import com.sheraz.core.data.db.dao.GitHubRepoIssueEntityDao
@@ -29,7 +30,8 @@ import javax.inject.Singleton
         DataModule::class,
         LoggerModule::class,
         NetworkModule::class,
-        RepositoryModule::class
+        RepositoryModule::class,
+        CoroutinesDispatcherProviderModule::class
     ]
 )
 interface CoreComponent {
@@ -45,4 +47,5 @@ interface CoreComponent {
     fun appRepository(): AppRepository
     fun sharedPrefs(): AppSharedPrefs
     fun logger(): Logger
+    fun coroutinesDispatcherProvider(): CoroutinesDispatcherProvider
 }

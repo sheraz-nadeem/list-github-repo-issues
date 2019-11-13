@@ -1,4 +1,4 @@
-package com.sheraz.listgithubrepoissues.di.module
+package com.sheraz.core.di.module
 
 import com.sheraz.core.data.CoroutinesDispatcherProvider
 import dagger.Module
