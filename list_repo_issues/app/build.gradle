@@ -17,6 +17,7 @@ android {
         versionName rootProject.ext.appVersionName
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
+        multiDexEnabled true
     }
 
     dataBinding {
@@ -48,9 +49,11 @@ dependencies {
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
+    implementation "androidx.multidex:multidex:2.0.1"
+
     implementation "androidx.constraintlayout:constraintlayout:$rootProject.constraintLayoutVersion"
     implementation "com.google.android.material:material:$rootProject.googleAndroidMaterialVersion"
-
+    implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.1.0"
 
     // Useful Kotlin Extensions
     implementation "androidx.core:core-ktx:$rootProject.androidXCoreVersion"

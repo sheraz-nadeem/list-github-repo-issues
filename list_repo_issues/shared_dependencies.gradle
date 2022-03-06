@@ -24,6 +24,10 @@ dependencies {
     // Paging
     implementation "androidx.paging:paging-runtime-ktx:$rootProject.pagingVersion"
 
+    // Retrofit
+    implementation "com.squareup.retrofit2:retrofit:$rootProject.retrofitVersion"
+    implementation "com.squareup.retrofit2:converter-gson:$rootProject.retrofitVersion"
+    implementation "com.jakewharton.retrofit:retrofit2-kotlin-coroutines-adapter:$rootProject.retrofitKotlinCoroutineAdapterVersion"
 
     // Testing Dependencies
     testImplementation "junit:junit:$rootProject.junitVersion"

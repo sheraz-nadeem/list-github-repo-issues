@@ -139,7 +139,7 @@ class HomeActivity : BaseActivityToolbar<ActivityHomeBinding, HomeViewModel>(), 
         return true
     }
 
-    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item?.itemId) {
             R.id.clearLocalDbCacheMenuItem -> handleClearCache()
             R.id.searchRepoMenuItem -> handleSearchRepo()
