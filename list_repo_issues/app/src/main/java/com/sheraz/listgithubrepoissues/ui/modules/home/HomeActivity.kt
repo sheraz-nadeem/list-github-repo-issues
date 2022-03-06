@@ -4,64 +4,58 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import androidx.lifecycle.LiveData
+import androidx.activity.viewModels
 import androidx.lifecycle.Observer
 import androidx.paging.PagedList
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
-import com.sheraz.core.data.repository.AppRepository
 import com.sheraz.core.data.sharedprefs.AppSharedPrefs
 import com.sheraz.core.data.sharedprefs.getGitHubRepoName
 import com.sheraz.core.data.sharedprefs.getGitHubRepoOwner
 import com.sheraz.listgithubrepoissues.BR
 import com.sheraz.listgithubrepoissues.R
 import com.sheraz.listgithubrepoissues.databinding.ActivityHomeBinding
-import com.sheraz.listgithubrepoissues.di.Injector
-import com.sheraz.listgithubrepoissues.extensions.bindViewModel
 import com.sheraz.listgithubrepoissues.extensions.findFragmentByTag
 import com.sheraz.listgithubrepoissues.ui.models.GitHubRepoIssueItem
 import com.sheraz.listgithubrepoissues.ui.modules.adapters.HomeAdapter
 import com.sheraz.listgithubrepoissues.ui.modules.base.BaseActivityToolbar
 import com.sheraz.listgithubrepoissues.ui.modules.home.detail.GoToDetailBottomSheetDialogFragment
 import com.sheraz.listgithubrepoissues.ui.modules.home.searchrepo.SearchRepositoryBottomSheetDialogFragment
-import kotlinx.android.synthetic.main.activity_home.*
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.android.synthetic.main.activity_home.llNoData
+import kotlinx.android.synthetic.main.activity_home.rvGitHubRepoIssuesList
+import kotlinx.android.synthetic.main.activity_home.swipeRefreshLayout
+import kotlinx.android.synthetic.main.activity_home.tvRepoFullName
+import kotlinx.android.synthetic.main.activity_home.tvRepoOwnerName
+import javax.inject.Inject
 
 /**
  * HomeActivity class for our Home view.
  */
 
-class HomeActivity : BaseActivityToolbar<ActivityHomeBinding, HomeViewModel>(), SearchRepositoryBottomSheetDialogFragment.OnChooseRepositoryListener {
+@AndroidEntryPoint
+class HomeActivity : BaseActivityToolbar<ActivityHomeBinding, HomeViewModel>(),
+    SearchRepositoryBottomSheetDialogFragment.OnChooseRepositoryListener {
 
     private var activityHomeBinding: ActivityHomeBinding? = null
     private var ownerName = ""
     private var repoName = ""
     private var isActivityRecreated = false
 
-    private val appSharedPrefs: AppSharedPrefs
-    private val homeViewModelFactory: HomeViewModelFactory
-    private val appRepository: AppRepository
-    private val homeAdapter: HomeAdapter
+    @Inject
+    lateinit var appSharedPrefs: AppSharedPrefs
+
+    @Inject
+    lateinit var homeAdapter: HomeAdapter
 
     private val pagedListObserver = Observer<PagedList<GitHubRepoIssueItem>> { submitList(it, false) }
     private val loadingStatusObserver = Observer<Boolean> { handleFetchInProgress(it) }
     private val networkErrorObserver = Observer<Exception> { handleNetworkError(it) }
-
-    init {
-
-        logger.d(TAG, "init(): ")
-        appSharedPrefs = Injector.getCoreComponent().sharedPrefs()
-        homeAdapter = Injector.getAppComponent().homeAdapter()
-        appRepository = Injector.getCoreComponent().appRepository()
-        homeViewModelFactory = Injector.getAppComponent().homeViewModelFactory()
-
-    }
-
-    private val homeViewModel by bindViewModel<HomeViewModel>(homeViewModelFactory)
-
+    private val homeViewModel by viewModels<HomeViewModel>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        logger.d(TAG, "onCreate(): ")
         super.onCreate(savedInstanceState)
+        logger.d(TAG, "onCreate(): homeViewModel = $homeViewModel, logger = $logger, homeAdapter = $homeAdapter")
 
         isActivityRecreated = savedInstanceState != null
         performDataBinding()
@@ -235,7 +229,8 @@ class HomeActivity : BaseActivityToolbar<ActivityHomeBinding, HomeViewModel>(), 
 
         logger.d(TAG, "openSearchRepoBottomSheet(): ")
 
-        var fragment: SearchRepositoryBottomSheetDialogFragment? = findFragmentByTag(SearchRepositoryBottomSheetDialogFragment.TAG)
+        var fragment: SearchRepositoryBottomSheetDialogFragment? =
+            findFragmentByTag(SearchRepositoryBottomSheetDialogFragment.TAG)
 
         fragment?.dismiss()
 

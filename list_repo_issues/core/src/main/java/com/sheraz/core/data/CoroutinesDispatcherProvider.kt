@@ -1,8 +1,9 @@
 package com.sheraz.core.data
 
 import kotlinx.coroutines.CoroutineDispatcher
+import javax.inject.Inject
 
-data class CoroutinesDispatcherProvider (
+class CoroutinesDispatcherProvider(
     val mainDispatcher: CoroutineDispatcher,
     val ioDispatcher: CoroutineDispatcher,
     val computationDispatcher: CoroutineDispatcher

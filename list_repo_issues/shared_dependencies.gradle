@@ -14,9 +14,8 @@ dependencies {
     implementation "androidx.lifecycle:lifecycle-extensions:$rootProject.lifecycleVersion"
 
     // Dagger
-    implementation "com.google.dagger:dagger:$rootProject.daggerVersion"
-    kapt "com.google.dagger:dagger-compiler:$rootProject.daggerVersion"
-    kaptAndroidTest "com.google.dagger:dagger-compiler:$rootProject.daggerVersion"
+    implementation "com.google.dagger:hilt-android:$rootProject.daggerVersion"
+    kapt "com.google.dagger:hilt-compiler:$rootProject.daggerVersion"
 
     // Picasso
     implementation "com.squareup.picasso:picasso:$rootProject.picassoVersion"

@@ -6,39 +6,47 @@ import androidx.lifecycle.Transformations
 import androidx.paging.DataSource
 import androidx.paging.LivePagedListBuilder
 import androidx.paging.PagedList
+import com.sheraz.core.data.CoroutinesDispatcherProvider
 import com.sheraz.core.data.repository.AppRepository
 import com.sheraz.core.data.sharedprefs.AppSharedPrefs
 import com.sheraz.core.data.sharedprefs.getSearchQuery
+import com.sheraz.core.utils.Logger
 import com.sheraz.listgithubrepoissues.extensions.toUiModel
 import com.sheraz.listgithubrepoissues.ui.models.GitHubRepoItem
 import com.sheraz.listgithubrepoissues.ui.modules.base.BaseBoundaryCallback
 import com.sheraz.listgithubrepoissues.ui.modules.base.BaseViewModel
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
-
+import javax.inject.Inject
 
 /**
  * ViewModel that is used by our [SearchRepositoryBottomSheetDialogFragment]
  * to maintain its state.
  */
 
-class SearchRepoViewModel(
+@HiltViewModel
+class SearchRepoViewModel @Inject constructor(
     private val appRepository: AppRepository,
-    private val appSharedPrefs: AppSharedPrefs
-): BaseViewModel() {
-
+    private val appSharedPrefs: AppSharedPrefs,
+    private val logger: Logger,
+    private val dispatcherProvider: CoroutinesDispatcherProvider
+) : BaseViewModel(logger, dispatcherProvider) {
 
     private val _queryLiveData = MutableLiveData<String>().apply { postValue(appSharedPrefs.getSearchQuery()) }
-    private val _reposLiveData: LiveData<DataSource.Factory<Int, GitHubRepoItem>> = Transformations.map(_queryLiveData) {query ->
-        logger.v(TAG, "_reposLiveData: query = $query")
-        appRepository.getAllReposPagedFactory(query).map {it.toUiModel()}.also { search() }
-    }
+    private val _reposLiveData: LiveData<DataSource.Factory<Int, GitHubRepoItem>> =
+        Transformations.map(_queryLiveData) { query ->
+            logger.v(TAG, "_reposLiveData: query = $query")
+            appRepository.getAllReposPagedFactory(query).map { it.toUiModel() }.also { search() }
+        }
+
     private val _liveDataPagedList: LiveData<PagedList<GitHubRepoItem>> = Transformations.switchMap(_reposLiveData) {
         logger.v(TAG, "_liveDataPagedList: Building livePagedList")
         LivePagedListBuilder(it, pagedListConfig)
             .setBoundaryCallback(GitHubRepoBoundaryCallback())
             .build()
     }
+
     val liveDataPagedList: LiveData<PagedList<GitHubRepoItem>>
         get() = _liveDataPagedList
 
@@ -49,7 +57,7 @@ class SearchRepoViewModel(
 
     init {
 
-        logger.d(TAG, "init(): ")
+        logger.d(TAG, "init(): appRepository = $appRepository")
         setIsLoading(false)
 
         // Kahaf
@@ -85,21 +93,23 @@ class SearchRepoViewModel(
 
 
     override fun onCleared() {
-
         logger.d(TAG, "onCleared(): ")
         super.onCleared()
-
     }
 
-    inner class GitHubRepoBoundaryCallback: BaseBoundaryCallback<GitHubRepoItem>(logger, appRepository) {
+    inner class GitHubRepoBoundaryCallback : BaseBoundaryCallback<GitHubRepoItem>(logger, appRepository) {
 
         override fun requestData(isLastItem: Boolean) = when (appRepository.isFetchInProgress.value!!) {
 
-            true -> logger.v(TAG_REPO_BOUNDARY_CALLBACK, "requestData(): " +
-                    "isLastItem = $isLastItem, NETWORK FETCH is already in progress")
+            true -> logger.v(
+                TAG_REPO_BOUNDARY_CALLBACK, "requestData(): " +
+                        "isLastItem = $isLastItem, NETWORK FETCH is already in progress"
+            )
             false -> {
-                logger.d(TAG_REPO_BOUNDARY_CALLBACK, "requestData(): " +
-                        "isLastItem = $isLastItem, lastSearchQuery: ${_queryLiveData.value!!}")
+                logger.d(
+                    TAG_REPO_BOUNDARY_CALLBACK, "requestData(): " +
+                            "isLastItem = $isLastItem, lastSearchQuery: ${_queryLiveData.value!!}"
+                )
                 search()
             }
         }

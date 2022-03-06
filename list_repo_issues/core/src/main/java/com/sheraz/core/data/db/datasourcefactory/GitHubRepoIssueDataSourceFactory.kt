@@ -4,12 +4,14 @@ import androidx.paging.DataSource
 import com.sheraz.core.data.db.dao.GitHubRepoIssueEntityDao
 import com.sheraz.core.data.db.entity.GitHubRepoIssueEntity
 import com.sheraz.core.utils.Logger
+import javax.inject.Inject
+import javax.inject.Singleton
 
-
-class GitHubRepoIssueDataSourceFactory(
+@Singleton
+class GitHubRepoIssueDataSourceFactory @Inject constructor(
     private val logger: Logger,
     private val dao: GitHubRepoIssueEntityDao
-): BaseDataSourceFactory<GitHubRepoIssueEntity>(logger) {
+) : BaseDataSourceFactory<GitHubRepoIssueEntity>(logger) {
 
     private var ownerName: String = ""
 
@@ -26,14 +28,16 @@ class GitHubRepoIssueDataSourceFactory(
 
     fun setRepoAndQuery(owner: String, name: String): GitHubRepoIssueDataSourceFactory {
         // appending '%' so we can allow other characters to be before and after the query string
-        owner.let { this.ownerName = it }.also { this.likeQuery =  "$owner/"}
+        owner.let { this.ownerName = it }.also { this.likeQuery = "$owner/" }
         name.let { this.repoName = it }.also { this.likeQuery = "%${this.likeQuery}${name.replace(' ', '%')}%" }
         logger.d(TAG, "setRepoAndQuery(): repoName = $repoName, likeQuery = $likeQuery")
         create()
         return this
     }
 
-    fun refresh() { dataSource.invalidate()}
+    fun refresh() {
+        dataSource.invalidate()
+    }
 
     private fun buildDataSource(): DataSource<Int, GitHubRepoIssueEntity> {
 

@@ -2,30 +2,23 @@ package com.sheraz.listgithubrepoissues.ui.modules.base
 
 import android.os.Build
 import android.os.Bundle
-import android.view.View
 import android.view.ViewGroup
-import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
 import com.sheraz.listgithubrepoissues.R
-import kotlinx.android.synthetic.main.app_toolbar.*
+import kotlinx.android.synthetic.main.app_toolbar.flMainContainer
+import kotlinx.android.synthetic.main.app_toolbar.toolbar
 
 
 /**
  * An abstract base class with toolbar
  */
 
-abstract class BaseActivityToolbar<T : ViewDataBinding, VM : BaseViewModel>: BaseActivity<T, VM>() {
-
-    init {
-
-        logger.d(TAG, "init(): ")
-
-    }
+abstract class BaseActivityToolbar<T : ViewDataBinding, VM : BaseViewModel> : BaseActivity<T, VM>() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        logger.d(TAG, "onCreate(): ")
         super.onCreate(savedInstanceState)
+        logger.d(TAG, "onCreate(): logger = $logger")
 
         val toolbarBinding = DataBindingUtil.setContentView<T>(this, R.layout.app_toolbar)
         val contentBinding = DataBindingUtil.inflate<T>(layoutInflater, getLayoutResId(), flMainContainer, true)

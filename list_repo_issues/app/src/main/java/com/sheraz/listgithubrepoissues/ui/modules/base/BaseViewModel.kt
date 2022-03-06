@@ -2,29 +2,27 @@ package com.sheraz.listgithubrepoissues.ui.modules.base
 
 import androidx.databinding.ObservableBoolean
 import androidx.lifecycle.ViewModel
+import com.sheraz.core.data.CoroutinesDispatcherProvider
 import com.sheraz.core.utils.Logger
-import com.sheraz.listgithubrepoissues.di.Injector
+import dagger.hilt.android.AndroidEntryPoint
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancelChildren
+import javax.inject.Inject
 
 /**
  * An abstract base class for our ViewModels
  */
 
-abstract class BaseViewModel: ViewModel() {
-
+abstract class BaseViewModel(
+    private val logger: Logger,
+    dispatcherProvider: CoroutinesDispatcherProvider
+): ViewModel() {
 
     private val isLoading = ObservableBoolean(false)
     private val parentJob = Job()
-    protected val logger = Logger()
-    protected val dispatcherProvider = Injector.getCoreComponent().coroutinesDispatcherProvider()
     protected val scope = CoroutineScope(dispatcherProvider.mainDispatcher + parentJob)
-
-    init {
-        logger.d(TAG, "init(): ")
-    }
-
 
     fun getIsLoading(): ObservableBoolean {
         return isLoading

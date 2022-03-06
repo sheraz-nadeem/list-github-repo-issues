@@ -4,11 +4,14 @@ import androidx.paging.DataSource
 import com.sheraz.core.data.db.dao.GitHubRepoEntityDao
 import com.sheraz.core.data.db.entity.GitHubRepoEntity
 import com.sheraz.core.utils.Logger
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class GitHubRepoEntityDataSourceFactory(
+@Singleton
+class GitHubRepoEntityDataSourceFactory @Inject constructor(
     private val logger: Logger,
     private val dao: GitHubRepoEntityDao
-): BaseDataSourceFactory<GitHubRepoEntity>(logger) {
+) : BaseDataSourceFactory<GitHubRepoEntity>(logger) {
 
     init {
         logger.d(TAG, "init(): ")

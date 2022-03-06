@@ -13,6 +13,9 @@ import com.squareup.picasso.OkHttp3Downloader
 import com.squareup.picasso.Picasso
 import dagger.Module
 import dagger.Provides
+import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
+import dagger.hilt.components.SingletonComponent
 import okhttp3.Cache
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -26,13 +29,16 @@ import javax.inject.Singleton
  * & [GitHubNetworkDataSource] instances.
  */
 
+@InstallIn(SingletonComponent::class)
 @Module
 class NetworkModule {
 
     @Provides
+    @Singleton
     fun providerHttpLogger(logger: Logger): HttpLogger = HttpLogger(logger)
 
     @Provides
+    @Singleton
     fun provideLoggingInterceptor(httpLogger: HttpLogger): HttpLoggingInterceptor {
 
         return HttpLoggingInterceptor(httpLogger).also {
@@ -45,7 +51,7 @@ class NetworkModule {
 
     @Provides
     @Singleton
-    fun provideOkHttpClient(context: Context, httpLoggingInterceptor: HttpLoggingInterceptor) : OkHttpClient {
+    fun provideOkHttpClient(@ApplicationContext context: Context, httpLoggingInterceptor: HttpLoggingInterceptor) : OkHttpClient {
 //        val cache = Cache(context.cacheDir, CACHE_SIZE)
         return OkHttpClient.Builder()
             .addInterceptor(httpLoggingInterceptor)
@@ -59,17 +65,20 @@ class NetworkModule {
 
     @Provides
     @Singleton
-    fun providePicasso(context: Context, okHttp3Downloader: OkHttp3Downloader): Picasso {
+    fun providePicasso(@ApplicationContext context: Context, okHttp3Downloader: OkHttp3Downloader): Picasso {
         return Picasso.Builder(context).downloader(okHttp3Downloader).build()
     }
 
     @Provides
+    @Singleton
     fun provideCallAdapterFactory(): CoroutineCallAdapterFactory = CoroutineCallAdapterFactory()
 
     @Provides
+    @Singleton
     fun provideGson(): Gson = Gson()
 
     @Provides
+    @Singleton
     fun provideGsonConverterFactory(gson: Gson): GsonConverterFactory = GsonConverterFactory.create(gson)
 
     @Provides

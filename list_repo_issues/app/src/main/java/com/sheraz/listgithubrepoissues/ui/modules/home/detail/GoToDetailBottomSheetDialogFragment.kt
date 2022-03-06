@@ -12,37 +12,45 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.sheraz.core.utils.Logger
 import com.sheraz.listgithubrepoissues.R
 import com.sheraz.listgithubrepoissues.databinding.FragmentGoToDetailBottomSheetBinding
-import com.sheraz.listgithubrepoissues.di.Injector
 import com.sheraz.listgithubrepoissues.ui.models.GitHubRepoIssueItem
 import com.sheraz.listgithubrepoissues.utils.getFormattedDate
 import com.sheraz.listgithubrepoissues.utils.setWhiteNavigationBar
-import kotlinx.android.synthetic.main.fragment_go_to_detail_bottom_sheet.*
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.android.synthetic.main.fragment_go_to_detail_bottom_sheet.ibDoneAction
+import kotlinx.android.synthetic.main.fragment_go_to_detail_bottom_sheet.tvAuthorAssociation
+import kotlinx.android.synthetic.main.fragment_go_to_detail_bottom_sheet.tvAuthorLogin
+import kotlinx.android.synthetic.main.fragment_go_to_detail_bottom_sheet.tvCreatedAt
+import kotlinx.android.synthetic.main.fragment_go_to_detail_bottom_sheet.tvIssueBody
+import kotlinx.android.synthetic.main.fragment_go_to_detail_bottom_sheet.tvIssueState
+import kotlinx.android.synthetic.main.fragment_go_to_detail_bottom_sheet.tvIssueTitle
+import javax.inject.Inject
 
-
+@AndroidEntryPoint
 class GoToDetailBottomSheetDialogFragment : BottomSheetDialogFragment() {
 
     // Data
     private lateinit var gitHubRepoIssueItem: GitHubRepoIssueItem
 
+    @Inject
+    lateinit var logger: Logger
+
     override fun onCreate(savedInstanceState: Bundle?) {
-        logger.d(TAG, "onCreate: ")
         super.onCreate(savedInstanceState)
+        logger.d(TAG, "onCreate: logger = $logger")
         initData()
     }
 
     private fun initData() {
-
         logger.d(TAG, "initData: ")
         if (arguments != null && arguments!!.getParcelable<Parcelable>(ARG_REPO_DATA_ITEM) != null) {
             gitHubRepoIssueItem = arguments!!.getParcelable<Parcelable>(ARG_REPO_DATA_ITEM) as GitHubRepoIssueItem
             logger.v(TAG, "initData: gitHubRepoIssueItem: $gitHubRepoIssueItem")
         }
-
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         logger.d(TAG, "onCreateDialog: ")
-        val dialog =  super.onCreateDialog(savedInstanceState)
+        val dialog = super.onCreateDialog(savedInstanceState)
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
             setWhiteNavigationBar(dialog)
@@ -54,7 +62,8 @@ class GoToDetailBottomSheetDialogFragment : BottomSheetDialogFragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         logger.d(TAG, "onCreateView: ")
         val binding = DataBindingUtil.inflate<FragmentGoToDetailBottomSheetBinding>(
-            inflater, R.layout.fragment_go_to_detail_bottom_sheet, container, false)
+            inflater, R.layout.fragment_go_to_detail_bottom_sheet, container, false
+        )
         return binding.root
     }
 
@@ -93,7 +102,6 @@ class GoToDetailBottomSheetDialogFragment : BottomSheetDialogFragment() {
 
     companion object {
         val TAG = GoToDetailBottomSheetDialogFragment::class.java.simpleName
-        val logger: Logger = Injector.getCoreComponent().logger()
         private const val ARG_REPO_DATA_ITEM = "arg_repo_issue_item"
 
 

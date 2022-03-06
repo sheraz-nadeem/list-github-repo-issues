@@ -7,6 +7,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
 import com.sheraz.core.utils.Logger
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 /**
  * An abstract base class for all the activities in our app
@@ -18,18 +20,12 @@ abstract class BaseActivity<VIEW_DATA_BINDING : ViewDataBinding, VIEW_MODEL : Ba
     private var baseViewDataBinding: VIEW_DATA_BINDING? = null
     private lateinit var baseViewModel: VIEW_MODEL
 
-    protected val logger = Logger()
-
-    init {
-
-        logger.d(TAG, "init(): ")
-
-    }
-
+    @Inject
+    protected lateinit var logger: Logger
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        logger.d(TAG, "onCreate(): ")
         super.onCreate(savedInstanceState)
+        logger.d(TAG, "onCreate(): logger = $logger")
     }
 
     protected fun getViewDataBinding(): VIEW_DATA_BINDING? {
@@ -71,7 +67,8 @@ abstract class BaseActivity<VIEW_DATA_BINDING : ViewDataBinding, VIEW_MODEL : Ba
     /**
      * @return layout resource id
      */
-    @LayoutRes abstract fun getLayoutResId(): Int
+    @LayoutRes
+    abstract fun getLayoutResId(): Int
 
     /**
      * Override for set binding variable

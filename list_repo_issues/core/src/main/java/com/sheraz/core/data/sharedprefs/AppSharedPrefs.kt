@@ -8,6 +8,7 @@ import com.sheraz.core.data.sharedprefs.AppSharedPrefs.Companion.GITHUB_REPO_SEA
 import com.sheraz.core.data.sharedprefs.AppSharedPrefs.Companion.SELECTED_GITHUB_REPO_NAME_KEY
 import com.sheraz.core.data.sharedprefs.AppSharedPrefs.Companion.SELECTED_GITHUB_REPO_OWNER_KEY
 import javax.inject.Inject
+import javax.inject.Singleton
 
 /**
  * Extension functions for [SharedPreferences] class
@@ -34,7 +35,7 @@ fun AppSharedPrefs.setGitHubRepoName(repoName: String) = this.set(SELECTED_GITHU
 fun AppSharedPrefs.getSearchQuery() = this.get(GITHUB_REPO_SEARCH_QUERY_KEY, DEFAULT_GITHUB_REPO_SEARCH_QUERY)
 fun AppSharedPrefs.setSearchQuery(query: String) = this.set(GITHUB_REPO_SEARCH_QUERY_KEY, query)
 
-
+@Singleton
 class AppSharedPrefs @Inject constructor(private val sharedPreferences: SharedPreferences) {
 
     fun clearPrefsCache(): Unit = sharedPreferences.clearPrefs()
@@ -61,16 +62,16 @@ class AppSharedPrefs @Inject constructor(private val sharedPreferences: SharedPr
 
 
     companion object {
-        @Volatile
-        private var INSTANCE: AppSharedPrefs? = null
-
-        fun getInstance(sharedPreferences: SharedPreferences): AppSharedPrefs {
-            return INSTANCE ?: synchronized(this) {
-                INSTANCE ?: AppSharedPrefs(sharedPreferences).also {
-                    INSTANCE = it
-                }
-            }
-        }
+//        @Volatile
+//        private var INSTANCE: AppSharedPrefs? = null
+//
+//        fun getInstance(sharedPreferences: SharedPreferences): AppSharedPrefs {
+//            return INSTANCE ?: synchronized(this) {
+//                INSTANCE ?: AppSharedPrefs(sharedPreferences).also {
+//                    INSTANCE = it
+//                }
+//            }
+//        }
 
         const val SELECTED_GITHUB_REPO_OWNER_KEY = "selected_github_repo_owner_key"
         const val SELECTED_GITHUB_REPO_NAME_KEY = "selected_github_repo_name_key"

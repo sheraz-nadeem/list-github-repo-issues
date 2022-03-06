@@ -6,40 +6,53 @@ import androidx.lifecycle.Transformations
 import androidx.paging.DataSource
 import androidx.paging.LivePagedListBuilder
 import androidx.paging.PagedList
+import com.sheraz.core.data.CoroutinesDispatcherProvider
 import com.sheraz.core.data.repository.AppRepository
 import com.sheraz.core.data.sharedprefs.AppSharedPrefs
 import com.sheraz.core.data.sharedprefs.getGitHubRepoName
 import com.sheraz.core.data.sharedprefs.getGitHubRepoOwner
+import com.sheraz.core.utils.Logger
 import com.sheraz.listgithubrepoissues.extensions.toUiModel
 import com.sheraz.listgithubrepoissues.ui.models.GitHubRepoIssueItem
 import com.sheraz.listgithubrepoissues.ui.modules.base.BaseBoundaryCallback
 import com.sheraz.listgithubrepoissues.ui.modules.base.BaseViewModel
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 /**
  * ViewModel that is used by our HomeActivity
  * to maintain its state.
  */
 
-class HomeViewModel(
+@HiltViewModel
+class HomeViewModel @Inject constructor(
     private val appRepository: AppRepository,
-    private val appSharedPrefs: AppSharedPrefs
-): BaseViewModel() {
+    private val appSharedPrefs: AppSharedPrefs,
+    private val logger: Logger,
+    private val dispatcherProvider: CoroutinesDispatcherProvider
+) : BaseViewModel(logger, dispatcherProvider) {
 
-    private val _selectedRepoNameLiveData = MutableLiveData<String>().apply { postValue(appSharedPrefs.getGitHubRepoName()) }
-    private val _selectedRepoLiveData: LiveData<DataSource.Factory<Int, GitHubRepoIssueItem>> = Transformations.map(_selectedRepoNameLiveData) {it ->
-        val ownerName = appSharedPrefs.getGitHubRepoOwner()
-        val repoName = appSharedPrefs.getGitHubRepoName()
-        logger.v(TAG, "_selectedRepoLiveData(): ownerName: $ownerName, repoName: $repoName")
-        appRepository.getAllRepoIssuesPagedFactory(ownerName, repoName).map{ it.toUiModel() }.also { loadData() }
-    }
-    private val _liveDataRepoIssuesPagedList: LiveData<PagedList<GitHubRepoIssueItem>> = Transformations.switchMap(_selectedRepoLiveData) {
-        logger.v(TAG, "_liveDataRepoIssuesPagedList: Building livePagedList")
-        LivePagedListBuilder(it, pagedListConfig)
-            .setBoundaryCallback(GitHubRepoIssuesBoundaryCallback())
-            .build()
-    }
+    private val _selectedRepoNameLiveData =
+        MutableLiveData<String>().apply { postValue(appSharedPrefs.getGitHubRepoName()) }
+
+    private val _selectedRepoLiveData: LiveData<DataSource.Factory<Int, GitHubRepoIssueItem>> =
+        Transformations.map(_selectedRepoNameLiveData) { it ->
+            val ownerName = appSharedPrefs.getGitHubRepoOwner()
+            val repoName = appSharedPrefs.getGitHubRepoName()
+            logger.v(TAG, "_selectedRepoLiveData(): ownerName: $ownerName, repoName: $repoName")
+            appRepository.getAllRepoIssuesPagedFactory(ownerName, repoName).map { it.toUiModel() }.also { loadData() }
+        }
+
+    private val _liveDataRepoIssuesPagedList: LiveData<PagedList<GitHubRepoIssueItem>> =
+        Transformations.switchMap(_selectedRepoLiveData) {
+            logger.v(TAG, "_liveDataRepoIssuesPagedList: Building livePagedList")
+            LivePagedListBuilder(it, pagedListConfig)
+                .setBoundaryCallback(GitHubRepoIssuesBoundaryCallback())
+                .build()
+        }
+
     val liveDataRepoIssuesPagedList: LiveData<PagedList<GitHubRepoIssueItem>>
         get() = _liveDataRepoIssuesPagedList
 
@@ -50,7 +63,7 @@ class HomeViewModel(
 
     init {
 
-        logger.d(TAG, "init(): ")
+        logger.d(TAG, "init(): appRepository = $appRepository")
         setIsLoading(false)
 
         // Kahaf
@@ -90,25 +103,27 @@ class HomeViewModel(
     }
 
     override fun onCleared() {
-
         logger.d(TAG, "onCleared(): ")
         super.onCleared()
-
     }
 
-    inner class GitHubRepoIssuesBoundaryCallback: BaseBoundaryCallback<GitHubRepoIssueItem>(logger, appRepository) {
+    inner class GitHubRepoIssuesBoundaryCallback : BaseBoundaryCallback<GitHubRepoIssueItem>(logger, appRepository) {
 
         override fun requestData(isLastItem: Boolean) = when (appRepository.isFetchInProgress.value!!) {
 
-            true -> logger.v(TAG_REPO_BOUNDARY_CALLBACK, "requestData(): " +
-                    "isLastItem = $isLastItem, NETWORK FETCH is already in progress")
+            true -> logger.v(
+                TAG_REPO_BOUNDARY_CALLBACK, "requestData(): " +
+                        "isLastItem = $isLastItem, NETWORK FETCH is already in progress"
+            )
             false -> {
 
                 val ownerName = appSharedPrefs.getGitHubRepoOwner()
                 val repoName = appSharedPrefs.getGitHubRepoName()
 
-                logger.i(TAG_REPO_BOUNDARY_CALLBACK, "requestData(): " +
-                        "isLastItem = $isLastItem, ownerName: $ownerName, repoName: $repoName")
+                logger.i(
+                    TAG_REPO_BOUNDARY_CALLBACK, "requestData(): " +
+                            "isLastItem = $isLastItem, ownerName: $ownerName, repoName: $repoName"
+                )
 
                 loadData()
 

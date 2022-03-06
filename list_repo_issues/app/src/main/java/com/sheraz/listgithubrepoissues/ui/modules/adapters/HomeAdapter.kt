@@ -1,5 +1,6 @@
 package com.sheraz.listgithubrepoissues.ui.modules.adapters
 
+import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,20 +13,20 @@ import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.item_home.view.*
 import com.sheraz.listgithubrepoissues.R
 import com.sheraz.listgithubrepoissues.utils.GitHubRepoIssueDiffCallback
+import dagger.hilt.android.qualifiers.ApplicationContext
+import javax.inject.Inject
 
 
-class HomeAdapter (
+class HomeAdapter @Inject constructor(
     private val logger: Logger,
-    private val mPicasso: Picasso
+    private val mPicasso: Picasso,
+    @ApplicationContext private val appContext: Context,
 ) : PagedListAdapter<GitHubRepoIssueItem, HomeAdapter.ViewHolder>(GitHubRepoIssueDiffCallback()) {
-
 
     private var mListener: View.OnClickListener? = null
 
-    init { logger.d(TAG, "init(): ") }
-
     override fun onCreateViewHolder(viewGroup: ViewGroup, view_type: Int): ViewHolder {
-        logger.d(TAG, "onCreateViewHolder: ")
+        logger.d(TAG, "onCreateViewHolder: appContext = $appContext")
         val view = LayoutInflater.from(viewGroup.context).inflate(R.layout.item_home, viewGroup, false)
         return ViewHolder(view)
     }
@@ -43,20 +44,15 @@ class HomeAdapter (
     inner class ViewHolder(v: View) : RecyclerView.ViewHolder(v) {
 
         fun bind(gitHubRepoIssueItem: GitHubRepoIssueItem?) {
-
             if (gitHubRepoIssueItem == null) return
-
             setUpViews(gitHubRepoIssueItem)
             handleClicks()
-
         }
 
         private fun setUpViews(gitHubRepoIssueItem: GitHubRepoIssueItem?) {
-
             if (itemView.tag == null) {
                 itemView.tag = gitHubRepoIssueItem
             }
-
             logger.d(TAG, "setUpViews: position: $adapterPosition, title: ${gitHubRepoIssueItem?.title}, repositoryUrl: ${gitHubRepoIssueItem?.repositoryUrl}")
 
             mPicasso.load(gitHubRepoIssueItem?.authorAvatarUrl)
@@ -74,7 +70,6 @@ class HomeAdapter (
         }
 
         private fun handleClicks() {
-
             itemView.setOnClickListener {
                 val issueItem = getItem(adapterPosition)
                 it.tag = issueItem

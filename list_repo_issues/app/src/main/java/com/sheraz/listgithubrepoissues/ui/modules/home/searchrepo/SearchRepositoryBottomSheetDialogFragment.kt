@@ -4,61 +4,71 @@ import android.app.Dialog
 import android.content.DialogInterface
 import android.os.Build
 import android.os.Bundle
-import android.view.*
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.paging.PagedList
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.snackbar.Snackbar
-import com.sheraz.core.data.sharedprefs.*
+import com.sheraz.core.data.sharedprefs.AppSharedPrefs
+import com.sheraz.core.data.sharedprefs.getGitHubRepoName
+import com.sheraz.core.data.sharedprefs.getGitHubRepoOwner
+import com.sheraz.core.data.sharedprefs.getSearchQuery
+import com.sheraz.core.data.sharedprefs.setGitHubRepoName
+import com.sheraz.core.data.sharedprefs.setGitHubRepoOwner
+import com.sheraz.core.data.sharedprefs.setSearchQuery
+import com.sheraz.core.utils.Logger
 import com.sheraz.listgithubrepoissues.BR
 import com.sheraz.listgithubrepoissues.R
 import com.sheraz.listgithubrepoissues.databinding.FragmentSearchRepositoryBottomSheetBinding
-import com.sheraz.listgithubrepoissues.di.Injector
-import com.sheraz.listgithubrepoissues.extensions.bindViewModel
 import com.sheraz.listgithubrepoissues.ui.models.GitHubRepoItem
 import com.sheraz.listgithubrepoissues.ui.modules.adapters.SearchRepositoryAdapter
 import com.sheraz.listgithubrepoissues.utils.hideKeyboard
 import com.sheraz.listgithubrepoissues.utils.setWhiteNavigationBar
 import com.sheraz.listgithubrepoissues.utils.showKeyboard
-import kotlinx.android.synthetic.main.fragment_search_repository_bottom_sheet.*
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.android.synthetic.main.fragment_search_repository_bottom_sheet.etSearchRepo
+import kotlinx.android.synthetic.main.fragment_search_repository_bottom_sheet.flHeaderTextContainer
+import kotlinx.android.synthetic.main.fragment_search_repository_bottom_sheet.ibSearchBackAction
+import kotlinx.android.synthetic.main.fragment_search_repository_bottom_sheet.ibSearchRepoAction
+import kotlinx.android.synthetic.main.fragment_search_repository_bottom_sheet.llSearchContainer
+import kotlinx.android.synthetic.main.fragment_search_repository_bottom_sheet.llSelectRepoBottomSheetRoot
+import kotlinx.android.synthetic.main.fragment_search_repository_bottom_sheet.rvGitHubRepo
+import javax.inject.Inject
 
-
-class SearchRepositoryBottomSheetDialogFragment: BottomSheetDialogFragment(), DialogInterface.OnShowListener {
+@AndroidEntryPoint
+class SearchRepositoryBottomSheetDialogFragment : BottomSheetDialogFragment(), DialogInterface.OnShowListener {
 
     private lateinit var fragmentSearchRepositoryBottomSheetBinding: FragmentSearchRepositoryBottomSheetBinding
 
     private var ownerName = ""
     private var repoName = ""
 
-    private val logger = Injector.getCoreComponent().logger()
-    private val appSharedPrefs: AppSharedPrefs
-    private val searchRepositoryAdapter: SearchRepositoryAdapter
-    private val searchRepoViewModelFactory: SearchRepoViewModelFactory
+    @Inject
+    lateinit var logger: Logger
+
+    @Inject
+    lateinit var appSharedPrefs: AppSharedPrefs
+
+    @Inject
+    lateinit var searchRepositoryAdapter: SearchRepositoryAdapter
 
     private val pagedListObserver = Observer<PagedList<GitHubRepoItem>> { submitList(it, false) }
     private val loadingStatusObserver = Observer<Boolean> { handleFetchInProgress(it) }
     private val networkErrorObserver = Observer<Exception> { handleNetworkError(it) }
+    private val searchRepoViewModel by viewModels<SearchRepoViewModel>()
 
     // Interfaces
     private var onChooseRepositoryListener: OnChooseRepositoryListener? = null
 
-    init {
-        logger.d(TAG, "init(): ")
-
-        appSharedPrefs = Injector.getCoreComponent().sharedPrefs()
-        searchRepositoryAdapter = Injector.getAppComponent().searchRepoAdapter()
-        searchRepoViewModelFactory = Injector.getAppComponent().searchRepoViewModelFactory()
-    }
-
-    private val searchRepoViewModel by bindViewModel<SearchRepoViewModel>(searchRepoViewModelFactory)
-
-
     override fun onCreate(savedInstanceState: Bundle?) {
-        logger.d(TAG, "onCreate(): ")
         super.onCreate(savedInstanceState)
+        logger.d(TAG, "onCreate(): logger = $logger, searchRepoViewModel = $searchRepoViewModel")
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
@@ -78,7 +88,8 @@ class SearchRepositoryBottomSheetDialogFragment: BottomSheetDialogFragment(), Di
         logger.d(TAG, "onCreateView(): ")
         fragmentSearchRepositoryBottomSheetBinding =
             DataBindingUtil.inflate(
-                inflater, R.layout.fragment_search_repository_bottom_sheet, container, false)
+                inflater, R.layout.fragment_search_repository_bottom_sheet, container, false
+            )
 
         fragmentSearchRepositoryBottomSheetBinding.setVariable(BR.searchRepoViewModel, searchRepoViewModel)
         fragmentSearchRepositoryBottomSheetBinding.executePendingBindings()
@@ -143,7 +154,7 @@ class SearchRepositoryBottomSheetDialogFragment: BottomSheetDialogFragment(), Di
         }
 
         etSearchRepo.setOnEditorActionListener { v, actionId, _ ->
-            if(actionId == EditorInfo.IME_ACTION_DONE){
+            if (actionId == EditorInfo.IME_ACTION_DONE) {
 
                 if (v.text.toString().trim().isNotEmpty()) {
 //                    handleClearSearchCache()
@@ -201,7 +212,10 @@ class SearchRepositoryBottomSheetDialogFragment: BottomSheetDialogFragment(), Di
 
     private fun submitList(pagedList: PagedList<GitHubRepoItem>?, isRefreshing: Boolean) {
         searchRepositoryAdapter.submitList(pagedList)
-        logger.d(TAG, "submitList(): searchRepositoryAdapter.itemCount: ${searchRepositoryAdapter.itemCount}, pagedList: ${pagedList?.size}, isRefreshing: $isRefreshing")
+        logger.d(
+            TAG,
+            "submitList(): searchRepositoryAdapter.itemCount: ${searchRepositoryAdapter.itemCount}, pagedList: ${pagedList?.size}, isRefreshing: $isRefreshing"
+        )
     }
 
     private fun handleFetchInProgress(isFetchInProgress: Boolean) {
@@ -211,7 +225,11 @@ class SearchRepositoryBottomSheetDialogFragment: BottomSheetDialogFragment(), Di
 
     private fun handleNetworkError(exception: Exception) {
         logger.e(TAG, "handleNetworkError(): exception: $exception")
-        Snackbar.make(fragmentSearchRepositoryBottomSheetBinding.root, exception.message.toString(), Snackbar.LENGTH_LONG).show()
+        Snackbar.make(
+            fragmentSearchRepositoryBottomSheetBinding.root,
+            exception.message.toString(),
+            Snackbar.LENGTH_LONG
+        ).show()
     }
 
 //    private fun handleClearSearchCache() {

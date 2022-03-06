@@ -1,8 +1,8 @@
 package com.sheraz.core.di.module
 
-import com.sheraz.core.data.db.datasourcefactory.GitHubRepoEntityDataSourceFactory
 import com.sheraz.core.data.db.dao.GitHubRepoEntityDao
 import com.sheraz.core.data.db.dao.GitHubRepoIssueEntityDao
+import com.sheraz.core.data.db.datasourcefactory.GitHubRepoEntityDataSourceFactory
 import com.sheraz.core.data.db.datasourcefactory.GitHubRepoIssueDataSourceFactory
 import com.sheraz.core.data.repository.AppRepository
 import com.sheraz.core.data.repository.AppRepositoryImpl
@@ -10,7 +10,9 @@ import com.sheraz.core.network.GitHubNetworkDataSource
 import com.sheraz.core.utils.Logger
 import dagger.Module
 import dagger.Provides
-import javax.inject.Singleton
+import dagger.hilt.InstallIn
+import dagger.hilt.android.components.ViewModelComponent
+import dagger.hilt.android.scopes.ViewModelScoped
 
 /**
  * Module responsible for providing [AppRepository] instance
@@ -18,11 +20,12 @@ import javax.inject.Singleton
  * repository are created in future.
  */
 
+@InstallIn(ViewModelComponent::class)
 @Module
 class RepositoryModule {
 
     @Provides
-    @Singleton
+    @ViewModelScoped
     fun provideAppRepository(
         logger: Logger,
         gitHubRepoIssueEntityDao: GitHubRepoIssueEntityDao,
@@ -38,17 +41,5 @@ class RepositoryModule {
         gitHubRepoIssueDataSourceFactory,
         networkDataSource
     )
-
-    @Provides
-    fun provideGitHubRepoEntityDataSourceFactory(
-        logger: Logger,
-        gitHubRepoEntityDao: GitHubRepoEntityDao
-    ): GitHubRepoEntityDataSourceFactory = GitHubRepoEntityDataSourceFactory(logger, gitHubRepoEntityDao)
-
-    @Provides
-    fun provideGitHubRepoIssueDataSourceFactory(
-        logger: Logger,
-        gitHubRepoIssueEntityDao: GitHubRepoIssueEntityDao
-    ): GitHubRepoIssueDataSourceFactory = GitHubRepoIssueDataSourceFactory(logger, gitHubRepoIssueEntityDao)
 
 }
