@@ -34,7 +34,7 @@
                     android:paddingTop="@dimen/dimen_2"
                     android:paddingBottom="@dimen/dimen_2">
 
-                    <com.sheraz.core.widgets.TextViewNormal
+                    <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Repository Owner"
@@ -61,7 +61,7 @@
                     android:paddingTop="@dimen/dimen_2"
                     android:paddingBottom="@dimen/dimen_2">
 
-                    <com.sheraz.core.widgets.TextViewNormal
+                    <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Repository Full Name"

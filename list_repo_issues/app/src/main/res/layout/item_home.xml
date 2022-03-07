@@ -61,7 +61,7 @@
                     android:textSize="@dimen/text_size_small"
                     tools:text="Issue Title" />
 
-                <com.sheraz.core.widgets.TextViewNormal
+                <TextView
                     android:id="@+id/tvIssueBody"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -90,14 +90,14 @@
                 android:paddingTop="@dimen/dimen_2"
                 android:paddingBottom="@dimen/dimen_2">
 
-                <com.sheraz.core.widgets.TextViewNormal
+                <TextView
                     android:layout_width="@dimen/dimen_80"
                     android:layout_height="wrap_content"
                     android:text="Author"
                     android:textColor="@color/colorDarkText"
                     android:textSize="@dimen/text_size_smallest" />
 
-                <com.sheraz.core.widgets.TextViewNormal
+                <TextView
                     android:id="@+id/tvAuthorLogin"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -115,14 +115,14 @@
                 android:paddingTop="@dimen/dimen_2"
                 android:paddingBottom="@dimen/dimen_2">
 
-                <com.sheraz.core.widgets.TextViewNormal
+                <TextView
                     android:layout_width="@dimen/dimen_80"
                     android:layout_height="wrap_content"
                     android:text="State"
                     android:textColor="@color/colorDarkText"
                     android:textSize="@dimen/text_size_smallest" />
 
-                <com.sheraz.core.widgets.TextViewNormal
+                <TextView
                     android:id="@+id/tvIssueState"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -140,14 +140,14 @@
                 android:paddingTop="@dimen/dimen_2"
                 android:paddingBottom="@dimen/dimen_2">
 
-                <com.sheraz.core.widgets.TextViewNormal
+                <TextView
                     android:layout_width="@dimen/dimen_80"
                     android:layout_height="wrap_content"
                     android:text="Created At"
                     android:textColor="@color/colorDarkText"
                     android:textSize="@dimen/text_size_smallest" />
 
-                <com.sheraz.core.widgets.TextViewNormal
+                <TextView
                     android:id="@+id/tvCreatedAt"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -167,14 +167,14 @@
                 android:paddingTop="@dimen/dimen_2"
                 android:paddingBottom="@dimen/dimen_2">
 
-                <com.sheraz.core.widgets.TextViewNormal
+                <TextView
                     android:layout_width="@dimen/dimen_80"
                     android:layout_height="wrap_content"
                     android:text="Author Association"
                     android:textColor="@color/colorDarkText"
                     android:textSize="@dimen/text_size_smallest" />
 
-                <com.sheraz.core.widgets.TextViewNormal
+                <TextView
                     android:id="@+id/tvAuthorAssociation"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
