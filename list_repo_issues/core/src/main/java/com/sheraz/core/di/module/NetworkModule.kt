@@ -6,7 +6,6 @@ import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterF
 import com.sheraz.core.BuildConfig
 import com.sheraz.core.network.GitHubApiService
 import com.sheraz.core.network.GitHubNetworkDataSource
-import com.sheraz.core.network.GitHubNetworkDataSourceImpl
 import com.sheraz.core.network.HttpLogger
 import com.sheraz.core.utils.Logger
 import com.squareup.picasso.OkHttp3Downloader
@@ -42,7 +41,7 @@ class NetworkModule {
     fun provideLoggingInterceptor(httpLogger: HttpLogger): HttpLoggingInterceptor {
 
         return HttpLoggingInterceptor(httpLogger).also {
-            it.level = when(BuildConfig.DEBUG) {
+            it.level = when (BuildConfig.DEBUG) {
                 true -> HttpLoggingInterceptor.Level.BASIC
                 false -> HttpLoggingInterceptor.Level.NONE
             }
@@ -51,11 +50,14 @@ class NetworkModule {
 
     @Provides
     @Singleton
-    fun provideOkHttpClient(@ApplicationContext context: Context, httpLoggingInterceptor: HttpLoggingInterceptor) : OkHttpClient {
-//        val cache = Cache(context.cacheDir, CACHE_SIZE)
+    fun provideOkHttpClient(
+        @ApplicationContext context: Context,
+        httpLoggingInterceptor: HttpLoggingInterceptor
+    ): OkHttpClient {
+        val cache = Cache(context.cacheDir, CACHE_SIZE)
         return OkHttpClient.Builder()
             .addInterceptor(httpLoggingInterceptor)
-//            .cache(cache)
+            .cache(cache)
             .build()
     }
 
@@ -65,7 +67,10 @@ class NetworkModule {
 
     @Provides
     @Singleton
-    fun providePicasso(@ApplicationContext context: Context, okHttp3Downloader: OkHttp3Downloader): Picasso {
+    fun providePicasso(
+        @ApplicationContext context: Context,
+        okHttp3Downloader: OkHttp3Downloader
+    ): Picasso {
         return Picasso.Builder(context).downloader(okHttp3Downloader).build()
     }
 
@@ -83,9 +88,11 @@ class NetworkModule {
 
     @Provides
     @Singleton
-    fun provideRetrofit(okHttpClient: OkHttpClient,
-                        coroutineCallAdapterFactory: CoroutineCallAdapterFactory,
-                        gsonConverterFactory: GsonConverterFactory) : Retrofit {
+    fun provideRetrofit(
+        okHttpClient: OkHttpClient,
+        coroutineCallAdapterFactory: CoroutineCallAdapterFactory,
+        gsonConverterFactory: GsonConverterFactory
+    ): Retrofit {
 
         return Retrofit.Builder()
             .client(okHttpClient)
@@ -100,12 +107,6 @@ class NetworkModule {
     @Singleton
     fun provideApiService(retrofit: Retrofit): GitHubApiService {
         return GitHubApiService.invoke(retrofit)
-    }
-
-    @Provides
-    @Singleton
-    fun provideNetworkDataSource(logger: Logger, apiService: GitHubApiService) : GitHubNetworkDataSource {
-        return GitHubNetworkDataSourceImpl.invoke(logger, apiService)
     }
 
     companion object {

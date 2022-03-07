@@ -8,6 +8,7 @@ import com.sheraz.core.network.response.Result
 import com.sheraz.core.utils.Logger
 import com.sheraz.core.utils.safeApiCall
 import java.io.IOException
+import javax.inject.Inject
 
 
 /**
@@ -16,7 +17,7 @@ import java.io.IOException
  * responses.
  */
 
-class GitHubNetworkDataSourceImpl(
+class GitHubNetworkDataSourceImpl @Inject constructor(
     private val logger: Logger,
     private val gitHubApiService: GitHubApiService
 ) : GitHubNetworkDataSource {
