@@ -4,27 +4,34 @@ import android.content.Context
 import android.graphics.Typeface
 import android.util.AttributeSet
 import androidx.appcompat.widget.AppCompatTextView
+import com.sheraz.core.utils.Logger
+import dagger.hilt.android.AndroidEntryPoint
+import dagger.hilt.android.qualifiers.ActivityContext
+import dagger.hilt.android.qualifiers.ApplicationContext
+import javax.inject.Inject
 
-class TextViewArcaHeavy : AppCompatTextView {
+@AndroidEntryPoint
+class TextViewArcaHeavy @JvmOverloads constructor(
+    context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
+) : AppCompatTextView(context, attrs, defStyleAttr) {
+
+    @ActivityContext
+    @Inject
+    lateinit var activityContext: Context
+
+    @Inject
+    lateinit var logger: Logger
 
     private var fontHeavy: Typeface? = null
 
-    constructor(context: Context) : super(context) {
-        fontHeavy = Typeface.createFromAsset(context.assets, "fonts/Arca-Heavy.ttf")
-        setCustomFontHeavy()
-    }
-
-    constructor(context: Context, attrs: AttributeSet, defStyleAttr: Int) : super(context, attrs, defStyleAttr) {
-        fontHeavy = Typeface.createFromAsset(context.assets, "fonts/Arca-Heavy.ttf")
-        setCustomFontHeavy()
-    }
-
-    constructor(context: Context, attrs: AttributeSet) : super(context, attrs) {
+    init {
         fontHeavy = Typeface.createFromAsset(context.assets, "fonts/Arca-Heavy.ttf")
         setCustomFontHeavy()
     }
 
     private fun setCustomFontHeavy() {
+        logger.d(TAG, "setCustomFont: context = $context, activityContext = $activityContext")
         this.typeface = fontHeavy
     }
 }
+private const val TAG = "TextViewArcaHeavy"
