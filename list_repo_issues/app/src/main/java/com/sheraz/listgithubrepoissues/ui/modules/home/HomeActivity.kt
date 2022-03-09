@@ -12,6 +12,7 @@ import com.google.android.material.snackbar.Snackbar
 import com.sheraz.core.data.sharedprefs.AppSharedPrefs
 import com.sheraz.core.data.sharedprefs.getGitHubRepoName
 import com.sheraz.core.data.sharedprefs.getGitHubRepoOwner
+import com.sheraz.core.network.worker.UpdateReposWorker
 import com.sheraz.listgithubrepoissues.BR
 import com.sheraz.listgithubrepoissues.R
 import com.sheraz.listgithubrepoissues.databinding.ActivityHomeBinding
@@ -65,6 +66,11 @@ class HomeActivity : BaseActivityToolbar<ActivityHomeBinding, HomeViewModel>(),
         initUI()
         updateUi()
         setUpListeners()
+        scheduleRepoUpdateWorker()
+    }
+
+    private fun scheduleRepoUpdateWorker() {
+        UpdateReposWorker.enqueue(this)
     }
 
     override fun onResume() {

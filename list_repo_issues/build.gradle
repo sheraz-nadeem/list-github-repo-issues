@@ -2,7 +2,7 @@
 
 buildscript {
     ext.kotlin_version = '1.5.31'
-    ext.daggerVersion = '2.41'
+    ext.hiltVersion = '2.41'
     repositories {
         google()
         jcenter()
@@ -11,7 +11,7 @@ buildscript {
     dependencies {
         classpath 'com.android.tools.build:gradle:3.5.4'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-        classpath "com.google.dagger:hilt-android-gradle-plugin:$daggerVersion"
+        classpath "com.google.dagger:hilt-android-gradle-plugin:$hiltVersion"
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
     }
@@ -57,6 +57,8 @@ ext {
 //    daggerVersion = '2.41'
     pagingVersion = '2.1.0'
     picassoVersion = '2.71828'
+    workManagerVersion = '2.5.0'
+    hiltWorkManagerVersion = '1.0.0'
 
 
     // Test dependencies

@@ -287,8 +287,9 @@ class AppRepositoryImpl(
 
     }
 
-    private fun getNumOfRowsIssueEntity(query: String) = gitHubRepoIssueEntityDao.getNumOfRowsForQuery(query)
-    private fun getNumOfRowsRepoEntity(query: String) = gitHubRepoEntityDao.getNumOfRowsForQuery(query)
+    override fun getNumOfRowsIssueEntity(query: String) = gitHubRepoIssueEntityDao.getNumOfRowsForQuery(query)
+    override fun getNumOfRowsRepoEntity(query: String) = gitHubRepoEntityDao.getNumOfRowsForQuery(query)
+    override fun getTotalNumOfRepositories() = gitHubRepoEntityDao.getTotalNumOfRows()
 
     private fun getActualPage(page: Int, numOfRows: Int): Int {
         return when (page > 0) {

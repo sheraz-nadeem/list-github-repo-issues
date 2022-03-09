@@ -11,8 +11,8 @@ import com.sheraz.core.utils.Logger
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
-import dagger.hilt.android.components.ViewModelComponent
-import dagger.hilt.android.scopes.ViewModelScoped
+import dagger.hilt.components.SingletonComponent
+import javax.inject.Singleton
 
 /**
  * Module responsible for providing [AppRepository] instance
@@ -20,12 +20,12 @@ import dagger.hilt.android.scopes.ViewModelScoped
  * repository are created in future.
  */
 
-@InstallIn(ViewModelComponent::class)
+@InstallIn(SingletonComponent::class)
 @Module
 class RepositoryModule {
 
     @Provides
-    @ViewModelScoped
+    @Singleton
     fun provideAppRepository(
         logger: Logger,
         gitHubRepoIssueEntityDao: GitHubRepoIssueEntityDao,

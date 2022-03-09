@@ -24,6 +24,10 @@ interface AppRepository {
 
     fun resetNoMoreItemsAvailable()
 
+    fun getNumOfRowsRepoEntity(query: String): Int
+    fun getNumOfRowsIssueEntity(query: String): Int
+    fun getTotalNumOfRepositories(): Int
+
     fun getAllRepoIssuesPagedFactory(ownerName: String, repoName: String): DataSource.Factory<Int, GitHubRepoIssueEntity>
     fun getAllReposPagedFactory(repoName: String): DataSource.Factory<Int, GitHubRepoEntity>
 
