@@ -30,6 +30,6 @@ class DataModule {
     @Singleton
     fun provideDefaultSharedPrefs(
         @ApplicationContext context: Context
-    ): SharedPreferences = PreferenceManager.getDefaultSharedPreferences(context.applicationContext)
+    ): SharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
 
 }
