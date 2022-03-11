@@ -3,6 +3,7 @@ package com.sheraz.listgithubrepoissues.ui.modules.home
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
+import androidx.lifecycle.viewModelScope
 import androidx.paging.DataSource
 import androidx.paging.LivePagedListBuilder
 import androidx.paging.PagedList
@@ -11,6 +12,8 @@ import com.sheraz.core.data.repository.AppRepository
 import com.sheraz.core.data.sharedprefs.AppSharedPrefs
 import com.sheraz.core.data.sharedprefs.getGitHubRepoName
 import com.sheraz.core.data.sharedprefs.getGitHubRepoOwner
+import com.sheraz.core.network.GitHubNetworkDataSourceWithConfigFactory
+import com.sheraz.core.network.NetworkConfig
 import com.sheraz.core.utils.Logger
 import com.sheraz.listgithubrepoissues.extensions.toUiModel
 import com.sheraz.listgithubrepoissues.ui.models.GitHubRepoIssueItem
@@ -19,6 +22,7 @@ import com.sheraz.listgithubrepoissues.ui.modules.base.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
+import org.json.JSONObject
 import javax.inject.Inject
 
 /**
@@ -61,6 +65,8 @@ class HomeViewModel @Inject constructor(
     val networkFetchStatusLiveData = appRepository.isFetchInProgress
     val networkErrorStatusLiveData = appRepository.networkError
 
+    @Inject lateinit var gitHubNetworkDataSourceWithConfigFactory: GitHubNetworkDataSourceWithConfigFactory
+
     init {
 
         logger.d(TAG, "init(): appRepository = $appRepository")
@@ -75,6 +81,23 @@ class HomeViewModel @Inject constructor(
                 .setEnablePlaceholders(false)
                 .build()
 
+        setupConfigFactory()
+
+    }
+
+    // TODO: This is just a demonstration of usage of @AssistedFactory
+    private fun setupConfigFactory() {
+        viewModelScope.launch(dispatcherProvider.ioDispatcher) {
+            val networkDataSourceWithConfig = gitHubNetworkDataSourceWithConfigFactory.create(NetworkConfig(
+                JSONObject("{\"data\": {\"config\": \"WhatAConfig-hahaha\"}}}")
+            ))
+
+            val ownerName = appSharedPrefs.getGitHubRepoOwner()
+            val repoName = appSharedPrefs.getGitHubRepoName()
+            logger.i(TAG, "setupConfigFactory(): ownerName: $ownerName, repoName: $repoName")
+
+            networkDataSourceWithConfig.loadRepoIssuesFromNetwork(ownerName, repoName)
+        }
     }
 
     fun selectRepo(repoName: String) {
